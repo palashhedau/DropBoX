@@ -26,7 +26,7 @@ export default class About extends Component{
 							</div>
 					
 							<div className="panel-body">
-								<h3>This is my first React Single Page Application</h3>
+								<h3>Dropbox*** This is my first React Single Page Application</h3>
 							</div>
 						</div>
 					</div>
