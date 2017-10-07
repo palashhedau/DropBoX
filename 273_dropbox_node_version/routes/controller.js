@@ -86,7 +86,7 @@ module.exports = function(app){
 						res.status(200).json({success : false , error : 'user already present'  }) 
 					}else{
 						
-						var userObject = [[email , password , fname , lname , dob , gender]];
+						var userObject = [[[email , password , fname , lname , dob , gender]]];
 						query1 = 'insert into users (email,password, fname, lname ,dob , gender) VALUES ?' ; 
 						
 						InserQuery(connection , query1 , userObject , function(result){
@@ -282,7 +282,7 @@ module.exports = function(app){
 				 res.status(500).json({})
 			 }else{
 				 var query2 = 'insert into user_groups_mapping (group_name, group_user) VALUES ?' ; 
-				 var params2 = [[groupname , emailToAdd  ]];
+				 var params2 = [[[groupname , emailToAdd  ]]];
 				 InserQuery(connection , query2 , params2 , function(result){
 					 if(result){
 						 res.status(200).json({success : true})
@@ -339,7 +339,7 @@ module.exports = function(app){
 			 if(result){
 				 res.status(500).json({})
 			 }else{
-				 var params2 = [[email , about , education , profession , lifeevents  ]];
+				 var params2 = [[[ email , about , education , profession , lifeevents  ]]];
 				 var query2 = 'insert into user_profile (email , about , education , profession , lifeevents) VALUES ?' ;
 				 
 				 InserQuery(connection , query2 , params2 , function(result){
@@ -382,7 +382,7 @@ module.exports = function(app){
 			 if(result == null ){
 				 res.status(500).json({})
 			 }else{
-				 res.status(200).json({groupMemberList : rows})
+				 res.status(200).json({groupMemberList : result})
 			 }
 		 })
 	 })
@@ -416,11 +416,12 @@ module.exports = function(app){
 		 var query1 = 'select filename , file_owner , t1.group_name , file_directory  from palash.user_groups_mapping t1 ,palash.group_files t2 where t1.group_name = ?   and t1.group_name = t2.group_name  and group_user = ?  ' ;
 		 var params = [  groupname , email ]  ;
 		 
-		 fetchDataQuery(connection , query1 , params1 , function(result){
+		 fetchDataQuery(connection , query1 , params , function(result){
+			 console.log('Result ' , result )
 			 if(result == null){
 				 res.status(500).json({})
 			 }else{
-				 res.status(200).json({filelist : rows})
+				 res.status(200).json({filelist : result})
 			 }
 		 })
 		
@@ -454,11 +455,12 @@ module.exports = function(app){
 		 if (!fs.existsSync(folderPath)) {
 			 fs.mkdirSync(folderPath , 0744);
 			 
-			 var params1 = [[email , foldername , starred , is_directory , directory ]];
+			 var params1 = [[[email , foldername , starred , is_directory , directory ]]];
 			 var query1 = 'insert into user_files (email,file_name,starred,is_directory, directory) VALUES ?' ;
 			 
 			 InserQuery(connection , query1 , params1 , function(result){
 				 if(!result){
+					 console.log('Error occured ');
 					 res.status(400).json({ success : false , error : ''})
 				 }else{
 					 var query2 = 'select file_name, directory,starred from user_files where email = ? and directory = ?' ;
@@ -495,7 +497,7 @@ module.exports = function(app){
 			 if(result){
 				 res.status(500).json({})
 			 }else{
-				 var params2 = [[groupname , email , filename , directory  ]];
+				 var params2 = [[[groupname , email , filename , directory  ]]];
 				 var query2 = 'insert into group_files (group_name, file_owner , filename , file_directory) VALUES ?' ;
 				 
 				 InserQuery(connection , query2 , params2 , function(result){
@@ -528,7 +530,7 @@ module.exports = function(app){
 		 
 		 CheckIfExistQuery(connection , query1, params1 , function(result){
 			 if(result){
-				 var query2 = 'select * from users_groups where group_owner = ? ' ;
+				 var query2 = 'select * from user_groups_mapping where group_user = ? ' ;
 				 var params2 = [email] ;
 				 
 				 fetchDataQuery(connection , query2 , params2 , function(result){
@@ -556,7 +558,7 @@ module.exports = function(app){
 								 res.status(500).json({})
 							 }else{
 								 var params5 = [email];
-								 var query5 = 'select * from users_groups where group_owner = ? ';
+								 var query5 = 'select * from user_groups_mapping where group_user = ? ';
 								 
 								 fetchDataQuery(connection , query5 , params5 , function(result){
 									 if(result == null ){
@@ -760,7 +762,7 @@ module.exports = function(app){
 function fetchDataQuery(connection , query , params , fn){
 	connection.query(query ,params ,  function(err , rows , fields){
 		if(err ){
-			console.log('Error while fetching data ');
+			console.log('Error while fetching data ' , err);
 			return fn(null) ; 
 		} 
 		else{
