@@ -302,24 +302,46 @@ module.exports = function(app){
 		 var email = req.body.email ;
 		 var groupname = req.body.groupname ;
 		 
-		 var query1 = 'delete from  users_groups where group_owner = ? and group_name = ?';
-		 var params1 = [email , groupname];
+		 var query1 = 'delete from  users_groups where  group_name = ?';
+		 var params1 = [groupname ];
 		 
 		 DeleteQuery(connection, query1 , params1 , function(result){
 			 if(!result){
 				 res.status(500).json({}) 
 			 }else{
-				 query2 = 'select * from users_groups where group_owner = ? ';
-				 params2 = [email] ; 
+				 var query3 = 'delete from  user_groups_mapping where  group_name = ?' ; 
+				 var params3 = [groupname ] ; 
 				 
-				 fetchDataQuery(connection, query2 , params2 , function(result){
-					 if(result == null ){
-						 res.status(500).json({})
-					 }else{
-						 res.status(200).json({grouplist : rows}) 
+				 DeleteQuery(connection, query3 , params3 , function(result){
+					 if(!result){
+						 res.status(500).json({}) 
+					 }else
+					 {
+						 query2 = 'select * from palash.user_groups_mapping where group_user = ? ';
+						 params2 = [email] ; 
+						 
+						 fetchDataQuery(connection, query2 , params2 , function(result){
+							 if(result == null ){
+								 res.status(500).json({})
+							 }else{
+								 res.status(200).json({grouplist : result}) 
+							 }
+						 })
 					 }
 				 })
+				 
+				 
+				 
+				 
+				 
+				 
 			 }
+			 
+			 
+			 
+			 
+			 
+			 
 		 })
 		 
 	 })

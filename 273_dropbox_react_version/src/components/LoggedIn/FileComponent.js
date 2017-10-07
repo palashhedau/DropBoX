@@ -100,7 +100,9 @@ class FileComponent extends Component{
 				 		<div>
 				 		<select onChange={(e) => {	this.setState({
 													 		shareToGroup : e.target.value,})
-												}} className="form-control" id="sel1"> 	
+												}} className="form-control" id="sel1">
+
+												<option>---Select Group---</option> 	
 										 	{this.props.groupList.map((group , key) => {
 										  		return <option   key={key}>{group.group_name}</option>
 										  	})} 
@@ -135,6 +137,7 @@ class FileComponent extends Component{
 				 		<select onChange={(e) => {	this.setState({
 													 		shareToEmail : e.target.value,})
 												}} className="form-control" id="sel1"> 	
+										 	<option>---Select User---</option> 
 										 	{this.props.AllUsers.map((user , key) => {
 										  		return <option   key={key}>{user.email}</option>
 										  	})} 

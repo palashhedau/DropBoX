@@ -23,7 +23,15 @@ class Home extends Component{
 			groupname : '' , 
 			directory : this.props.location.pathname.replace('/home' , '') === '' ? 'root' : 
 						(	this.props.location.pathname.replace('/files' , '') === '' ? 'root' :
-							this.props.location.pathname.replace('/home/' , '')),
+							(	this.props.location.pathname.replace('/profile_details' , '') === '' ? 'root' :
+							(	this.props.location.pathname.indexOf("/groups") === 0 ? 'root' :
+							(	this.props.location.pathname.indexOf("/shared") === 0 ? 'root' :
+								this.props.location.pathname.indexOf("/profile") === 0 ? 'root' :
+								this.props.location.pathname.replace('/home/' , ''))))),
+			
+
+
+
 			directoryForHeading : this.props.location.pathname.replace('/home' , '') === '' ? 'root' : 
 						this.props.location.pathname.replace('/home/' , ''),
 
