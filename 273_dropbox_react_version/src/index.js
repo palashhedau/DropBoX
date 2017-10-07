@@ -8,11 +8,8 @@ import  setAuthorizationToken from './utils/setAuthorizationToken'
 import jwtDecode from 'jwt-decode' ;
 //Pages
 import Home from './components/LoggedIn/Home'
-import Landing from './components/BeforeLoggedIn/Landing'
 import Registration from './components/BeforeLoggedIn/Registration'
 import Login from './components/BeforeLoggedIn/Login'
-import About from './components/BeforeLoggedIn/About'
-import Contact from './components/BeforeLoggedIn/Contact'
 import AuthenticateRouth from './utils/Authenticate'
 import FolderPage from './components/LoggedIn/FolderPage'
 import HomeComponent from './components/LoggedIn/HomeComponent'
@@ -22,16 +19,14 @@ import Groups from './components/LoggedIn/Groups'
 import GroupsContent from './components/LoggedIn/GroupsContent'
 import profile from './components/LoggedIn/profile'
 import SubmitProfile from './components/LoggedIn/submitProfile'
+import Landing2 from './components/BeforeLoggedIn/Menu'
 
 const Main = () => (
   
     <Switch>
           <Route path="/profile_details" component={AuthenticateRouth(Home(SubmitProfile))}/>
-          <Route exact path='/login' component={Login}/>
-         	<Route exact path='/registration' component={Registration}/>
-         	<Route exact path='/about' component={About}/>
-         	<Route exact path='/contact' component={Contact}/>
-        	<Route exact path='/' component={Landing}/>
+          <Route exact path='/login' component={Landing2(Login)}/>
+        	<Route exact path='/' component={Landing2(Registration)}/>
           <Route exact path='/home' component={AuthenticateRouth(Home(HomeComponent))}/>
           <Route path="/home/:term" component={AuthenticateRouth(Home(FolderPage))}/>
           <Route path="/shared" component={AuthenticateRouth(Home(SharedComponent))}/>

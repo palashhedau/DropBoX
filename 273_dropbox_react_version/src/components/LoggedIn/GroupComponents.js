@@ -38,11 +38,21 @@ class GroupComponent extends Component{
 		return (
 				 <li   className="list-group-item padd">
 				 	<Link to={this.state.groupUrl + this.props.group.group_name}>{this.props.group.group_name}</Link>
-				 	<button onClick={() => {
-				 		this.props.deleteGroup(this.props.email , this.props.group.group_name)
-				 	}} style={stylePadding} className="btn btn-danger pull-right btn-xs">Delete</button> 
 				 	
 				 	{
+				 		this.props.group.group_user === this.props.group.group_owner ? 
+				 		<button onClick={() => {
+				 		this.props.deleteGroup(this.props.email , this.props.group.group_name)
+				 		}} style={stylePadding} className="btn btn-danger pull-right btn-xs">Delete</button> 
+				 		: 
+				 		<b></b>
+				 	}
+
+				 	
+				 	{
+				 		this.props.group.group_user === this.props.group.group_owner ? 
+
+				 		(
 				 		this.state.showButtonOrDropDown === 'Button' ? 
 				 		<button className="btn btn-primary pull-right btn-xs" onClick={() => {
 				 			this.setState({showButtonOrDropDown : 'DropDOwn'})
@@ -51,13 +61,19 @@ class GroupComponent extends Component{
 				 		<select className="input-medium" onChange={(e) => {	this.setState({
 													 		addTogroup : e.target.value,})
 												}} className="form-control" id="sel1"> 	
+										 	<option>---Select Email---</option>
 										 	{this.props.AllUsers.map((user , key) => {
 										  		return <option   key={key}>{user.email}</option>
 										  	})} 
 
 						</select>
 						<button className="btn btn-primary btn-sm " onClick={() => {
-							this.props.addMembersToTheGroup(this.props.email , this.state.addTogroup , this.props.group.group_name)
+							console.log('FOunffffff ' , this.state.addTogroup);
+							if (this.state.addTogroup === ''){
+							}else{
+								this.props.addMembersToTheGroup(this.props.email , this.state.addTogroup , this.props.group.group_name)
+							}
+
 							this.setState({
 								showButtonOrDropDown : 'Button'
 							})
@@ -67,7 +83,7 @@ class GroupComponent extends Component{
 								showButtonOrDropDown : 'Button'
 							})
 						}}>Cancel</button>
-						</div>
+						</div>   ) : <div></div>
 				 	}
 
 

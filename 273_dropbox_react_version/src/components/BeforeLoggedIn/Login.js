@@ -35,14 +35,9 @@ class Login extends Component{
 	render(){
 		
 		return(
-				<div >
+				
+				<LoginContent loginProps={this.props}></LoginContent>
 					
-					<Menu></Menu>
-					<div className="col-sm-9 col-md-9 col-lg-9 padd" >
-						<LoginContent loginProps={this.props}></LoginContent>
-					</div>
-					
-				</div>
 			
 
 			)

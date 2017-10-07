@@ -5,7 +5,7 @@ import {starItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
 import {shareFile} from '../../actions/shareFileAction'
-import {deleteGroup , addMembersToTheGroup , getMembersOfGroup} from '../../actions/GroupAction'
+import {deleteGroup , addMembersToTheGroup , getMembersOfGroup ,  deleteMembersOfGroup} from '../../actions/GroupAction'
 import FileComponent from './FileComponent'
 import FileStarredComponents from './FileStarredComponents'
 
@@ -25,6 +25,11 @@ class GroupComponent extends Component{
 		this.props.getMembersOfGroup(this.props.email , this.state.directoryForGroups)
 	}
 	
+	
+
+
+
+
 	
 	render(){
 		const style10 = {
@@ -60,7 +65,21 @@ class GroupComponent extends Component{
 						{
 							this.props.groupmembers.map((member , key) => {
 							return <li className="list-group-item padd" key={key}>
-							<Link to={this.state.url+ member.group_user}>{member.group_user}</Link> </li>
+							<Link to={this.state.url+ member.group_user}>{member.group_user}</Link> 
+							{	
+								this.props.email === member.group_owner ? 
+
+								(
+								member.group_user === member.group_owner ? <b></b> :
+								<button className="btn btn-danger pull-right btn-xs" onClick={() => {
+									this.props.deleteMembersOfGroup(this.props.email , member.group_user , this.state.directoryForGroups )
+								}}>Delete User</button>
+								)
+								: 
+								<b></b>
+							}
+
+							</li>
 							})
 						}
 					</ul>
@@ -89,7 +108,13 @@ class GroupComponent extends Component{
 
 						{ this.props.listOfGroupSharedFiles.map((file,key) => {
 							return  <tr key={key}>
-								 		<td>	
+								 		<td>
+								 			{ file.filename.indexOf('jpg') !== -1 ? 
+													(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
+													file.filename.indexOf('.') !== -1 ?   
+													 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
+													: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+											}	
 								 			<a>{file.filename}</a>
 								 		</td>
 								 		<td>	
@@ -115,7 +140,8 @@ function mapDispatchToProps(dispatch){
 		shareFile : (filename , directory , fromUser , toUser ) => dispatch(shareFile(filename , directory , fromUser , toUser )),
 		deleteGroup : (email , groupname) => dispatch(deleteGroup(email,groupname)),
 		addMembersToTheGroup : (email , emailtoadd , groupname) => dispatch(addMembersToTheGroup(email , emailtoadd , groupname)),
-		getMembersOfGroup : (email , groupname ) => dispatch(getMembersOfGroup(email, groupname))
+		getMembersOfGroup : (email , groupname ) => dispatch(getMembersOfGroup(email, groupname)),
+		deleteMembersOfGroup : (email , membertodelete , groupname) => dispatch(deleteMembersOfGroup(email , membertodelete , groupname))
 	}
 }
 

@@ -8,30 +8,9 @@ export default class Registration extends Component{
 
 		console.log(this.props);
 		return (
-
-			
-
-			<div >
-				
-				<div >
+	
+				<RegistrationContent {...this.props}></RegistrationContent>
 					
-					<Menu></Menu>
-					<div className="col-sm-9 col-md-9 col-lg-9 padd" >
-						<RegistrationContent {...this.props}></RegistrationContent>
-					</div>
-				</div>
-				
-
-			</div>
-
-
-			
-
-
-
-
-
-
 			)
 
 	}

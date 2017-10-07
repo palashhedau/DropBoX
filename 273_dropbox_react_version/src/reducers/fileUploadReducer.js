@@ -54,7 +54,10 @@ export default function reducer (state=initialState , action )  {
 			console.log('DO Something with the members ') ;
 			return {...state ,  groupmembers : action.payload }
 		}
-		
+		case 'DELETE_MEMBER_SUCCESS' : {
+			return {...state ,  listOfGroupSharedFiles : action.payload.filelist ,
+								groupmembers : action.payload.groupMemberList}
+		}
 		default :
 			return state ; 
 

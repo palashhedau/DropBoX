@@ -70,19 +70,18 @@ class Home extends Component{
    	  this.props.setHomeHeading(heading) ;
       this.props.getAllFiles(this.props.email,'',this.state.directory) ; 
       this.props.getAllStarredFiles(this.props.email , this.state.directory);
-      console.log('Current location from Props ' , this.props.location.pathname)
       this.props.setDirectory(this.state.directory);
       this.props.getAllUsers(this.props.email) ;
       this.props.getAllGroups(this.props.email) ; 
       this.props.getAllSharedGroupComponents(this.props.email , this.state.directoryForGroups);
-      
+      this.props.getMembersOfGroup(this.props.email , this.state.directoryForGroups)
    }
 
 
 
-   componentDidUpdate(prevProps, prevState) {
-      
-   }
+   
+
+   
 
    changeFoldernameState(e){
    	this.setState({
@@ -365,6 +364,7 @@ function mapStateToProps(state) {
         directoryForServer : state.CurrentDirectoryReducer.directoryForServer,
         Heading : state.HomeReducer.Heading,
         AllUsers : state.HomeReducer.getAllUsers,
+        groupmembers : state.fileUploadReducer.groupmembers,
     };
 }
 

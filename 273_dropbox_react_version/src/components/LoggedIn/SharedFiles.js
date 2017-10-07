@@ -30,7 +30,7 @@ class SharedComponent extends Component{
 					</div>
 
 					
-					<table className="table table-striped">
+					<table className="table ">
 
 						<thead>
 					      <tr>

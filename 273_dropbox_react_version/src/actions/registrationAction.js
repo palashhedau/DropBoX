@@ -20,3 +20,12 @@ export function register(email , password, fname , lname , gender , dob)  {
 	  })
 	}
 }
+
+
+
+export function setBackRegistered(){
+	return {
+		type : 'SET_BACK_REGISTERED',
+		payload : {success : false }
+	}
+}

@@ -52,7 +52,7 @@ class FileComponent extends Component{
 								this.props.file.file_name.indexOf('.') !== -1 ?   
 								 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
 								: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
-							}
+						}
 						
 						{this.props.file.file_name}
 						</Link> 

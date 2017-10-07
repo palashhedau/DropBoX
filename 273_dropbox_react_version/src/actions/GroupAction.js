@@ -130,3 +130,30 @@ export function getMembersOfGroup(email , groupname )  {
 	}
 
 }
+
+
+
+
+
+export function deleteMembersOfGroup(email , membertodelete ,  groupname )  {
+	console.log('Prams for delete users ' , email , membertodelete , groupname) ; 
+	
+
+	return  function(dispatch){
+		axios.post('http://localhost:3002/deleteMembersOfGroup', {
+	  	email : email,
+	  	groupname : groupname,
+	  	membertodelete : membertodelete
+	  })
+	  .then(function (response) {
+	  
+	  	console.log('Response after delete  ' , response.data) ; 
+	  	dispatch({type : 'DELETE_MEMBER_SUCCESS' , payload : response.data });
+	  })
+	  .catch(function (error) {
+	  	console.log('Response after share Error ' , error) ; 
+	   dispatch({type : 'DELETE_MEMBER_FAILURE' , payload : null})
+	  })
+	}
+
+}

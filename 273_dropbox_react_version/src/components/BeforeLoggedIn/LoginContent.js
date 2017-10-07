@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {checkUser} from '../../actions/authAction'
 import { connect } from 'react-redux' ; 
+import { Link } from 'react-router-dom'
 
 class LoginContent  extends Component{
 
@@ -31,71 +32,64 @@ class LoginContent  extends Component{
 	}
 
 
+
+
 	render(){
 		
 		const textAlignRight = {
 			textAlign: "right"
 		}
 
-		
+		const paddingTop = {
+			paddingTop: "40px"
+		}
+			
+		const sharpCorner = {
+			borderRadius : "0"
+		}
 
 		return(
 			
-		<div>
-			<div className="panel panel-info " >
-					<div className="panel-heading">
-				        	<h4 >Login</h4>
-					</div>
-			
-						<div className="panel-body">
-							
-							
-								<div>
-								
-									<div className='col-sm-12 form-group'>
-										<div className='col-lg-2  col-md-2  ' ></div>
-										<div className='col-lg-2  col-md-2  col-sm-12 ' >
-											<label htmlFor='username' className="label label-primary" >Email :</label>
+				<div  className="row  col-sm-12 col-lg-12 col-md-12 foo " style={paddingTop}>
+										
+										<div className="row padd">
+												<div className='col-lg-12 col-md-12 col-sm-12'>
+													<h2>Sign in</h2>		
+												</div>
+												<div className='col-lg-12 col-md-12 col-sm-12'>
+													or <Link to="/">create an account</Link>		
+												</div>
 										</div>
-										<div className='col-sm-4 col-md-4  col-sm-12 '>
-											<input onChange={this.changeUsernameState.bind(this)}  type="text" name='username' id='username'   className="form-control"  placeholder="Username..." aria-describedby="basic-addon1" required />
+
+										<div className='row padd' >
+											
+											<div className='col-sm-12 col-lg-12 col-md-12' >
+												<input style={sharpCorner} onChange={this.changeUsernameState.bind(this)}  type="text" name='username' id='username'   className="form-control"  placeholder="Username..." aria-describedby="basic-addon1" required />
+											</div>
+											
 										</div>
-										<div className='col-lg-1  col-md-1  col-sm-12 '> </div>
-									</div>
+										
+										<div className='row padd'>
+											
+											<div className='col-sm-12 col-lg-12 col-md-12 '>
+												<input style={sharpCorner} onChange={this.changePasswordState.bind(this)}  type="password" name='password' id='pwd'   className="form-control"  placeholder="Password..." aria-describedby="basic-addon1"  required/>
+											</div>
+											
+										</div>
+										
+										<div className='row padd'>
+											<div className='col-sm-12 col-lg-12 col-md-12'>
+												<button style={sharpCorner}
+												  className="btn btn-info btn-block" onClick={ () => this.props.checkUser(this.state.email , this.state.password)}>Submit </button>
+												
+											</div>
+										</div>
 									
-									<div className='col-sm-12 form-group'>
-										<div className='col-lg-2  col-md-2  ' ></div>
-										<div className='col-lg-2  col-sm-2  col-sm-12 ' >
-											<label htmlFor='pwd' className="label label-primary" >Password :</label>
-										</div>
-										<div className='col-sm-4 col-sm-4  col-sm-12 '>
-											<input onChange={this.changePasswordState.bind(this)}  type="password" name='password' id='pwd'   className="form-control"  placeholder="Password..." aria-describedby="basic-addon1"  required/>
-										</div>
-										<div className='col-lg-1  col-md-1  col-sm-12 '> </div>
-									</div>
-									
-									<div className='col-sm-12 form-group'>
-										<div className='col-sm-4 ' style={textAlignRight}>
-										</div>
-										<div className='col-sm-2'>
-											<button onClick={ () => this.props.checkUser(this.state.email , this.state.password)}
-											  className="btn btn-default" >Submit </button>
-										</div>
-									</div>
 								
-								</div>
+				</div>
+								
 							
 					
-						</div>
-				
-					</div>
-					<div>
-						
-
-					</div>
-
-
-				</div>
 
 
 

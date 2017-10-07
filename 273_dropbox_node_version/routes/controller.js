@@ -48,7 +48,7 @@ module.exports = function(app){
 		const password = req.body.password ; 
 		
 		
-		var query = 'select * from palash.users where email =\'' + email + '\' and password = \'' + password + '\'' ; 
+		var query = 'select email , fname , lname from palash.users where email =\'' + email + '\' and password = \'' + password + '\'' ; 
 		
 		CheckIfExistQueryWithoutParams(connection , query , function(rowExist){
 			
@@ -58,7 +58,7 @@ module.exports = function(app){
 					username :  email
 				}, config.jwtSecret)
 				
-				res.status(201).json({token : token , success: true});
+				res.status(201).json({token : token , success: true , user : rowExist});
 			}else{
 				 res.status(401).json({success: false});
 			}
@@ -87,7 +87,7 @@ module.exports = function(app){
 					}else{
 						
 						var userObject = [[[email , password , fname , lname , dob , gender]]];
-						query1 = 'insert into users (email,password, fname, lname ,dob , gender) VALUES ?' ; 
+						query1 = 'insert into users (email,password, fname, lname ,gender , dob ) VALUES ?' ; 
 						
 						InserQuery(connection , query1 , userObject , function(result){
 							if(result){
@@ -180,28 +180,50 @@ module.exports = function(app){
 		 var file_name = req.body.filename ;
 		 var directory = req.body.directory ; 
 		 
-		 var query1 = 'UPDATE user_files SET starred = ? WHERE email = ? and file_name= ? and directory = ?' ;
+		 
 		 var params1 = [true , email, file_name , directory ] ;
 		 
-		 UpdateQuery(connection , query1 , params1 , function(result1){
-			 if(result1){
-				 
-				 var query2 = 'select file_name ,directory ,starred  from user_files where starred=\'1\' and email = ? ' ; 
-				 var params2 = [email ] ; 
-				 
-				 fetchDataQuery(connection , query2 , params2 , function(result2){
-					 var query3 = 'select file_name,directory,starred from user_files where email = ? and directory = ?' ;
-					 var params3 = [email, directory] ; 
-					 
-					 fetchDataQuery(connection , query3 , params3 , function(result3){
-						 res.status(200).json({starred_data : result2 , filelist : result3})
-					 })
-					 
+		 
+		 var query0 = "select starred from user_files WHERE email = ? and file_name= ? and directory = ? " ;
+		 params0 = [email, file_name , directory]
+		 fetchDataQuery(connection, query0, params0, function(result) {
+		 	if(result === null){
+		 		
+		 	}else{
+		 		
+		 		var query1 = 'UPDATE user_files SET starred = ? WHERE email = ? and file_name= ? and directory = ?' ;
+		 		
+		 		if(result[0].starred == 0){
+		 			var params1 = [true , email, file_name , directory ] ;
+		 		}else{
+		 			var params1 = [false , email, file_name , directory ] ;
+		 		}
+		 		 UpdateQuery(connection , query1 , params1 , function(result1){
+					 if(result1){
+						 
+						 var query2 = 'select file_name ,directory ,starred  from user_files where starred=\'1\' and email = ? ' ; 
+						 var params2 = [email ] ; 
+						 
+						 fetchDataQuery(connection , query2 , params2 , function(result2){
+							 var query3 = 'select file_name,directory,starred from user_files where email = ? and directory = ?' ;
+							 var params3 = [email, directory] ; 
+							 
+							 fetchDataQuery(connection , query3 , params3 , function(result3){
+								 res.status(200).json({starred_data : result2 , filelist : result3})
+							 })
+							 
+						 })
+						 
+						 
+					 }
 				 })
-				 
-				 
-			 }
+		 		
+		 	}
 		 })
+		 
+		 
+		 
+		
 	})
 	
 	
@@ -317,34 +339,88 @@ module.exports = function(app){
 						 res.status(500).json({}) 
 					 }else
 					 {
-						 query2 = 'select * from palash.user_groups_mapping where group_user = ? ';
-						 params2 = [email] ; 
+						 var query0 = "delete from palash.group_files where group_owner = ? and group_name = ?";
+						 var params0 = [email , groupname ] ; 
+						 DeleteQuery(connection, query0 , params0 , function(result){
+							 if(!result){
+								 res.status(500).json({}) 
+							 }else
+							 {
+								 query2 = 'select * from palash.user_groups_mapping t2 ,palash.users_groups t1 where group_user = ?  and t1.group_name = t2.group_name';
+								 params2 = [email] ; 
+								 
+								 fetchDataQuery(connection, query2 , params2 , function(result){
+									 if(result == null ){
+										 res.status(500).json({})
+									 }else{
+										 res.status(200).json({grouplist : result}) 
+									 }
+								 })
+							 }
+						 })
+					}
+				 })
+				 }
+		})
+		 
+	 })
+	 
+	 
+	  app.post('/deleteMembersOfGroup',  function(req, res) {
+		 var email = req.body.email ;
+		 var groupname = req.body.groupname ;
+		 var membertodelete = req.body.membertodelete ; 
+		 
+		 var query1 = 'delete from user_groups_mapping   where  group_name =  ?  and group_user = ? ';
+		 var params1 = [groupname , membertodelete ];
+		 
+		 DeleteQuery(connection, query1 , params1 , function(result){
+			 if(!result){
+				 console.log('First Delete error ') ; 
+				 res.status(500).json({}) 
+			 }else{
+				 var query2 = 'delete from palash.group_files where file_owner = ? and group_name = ? and group_owner = ? and file_owner <> group_owner' ; 
+				 var params2 = [membertodelete ,groupname , email   ] ; 
+				 
+				 DeleteQuery(connection, query2 , params2 , function(result){
+					 if(!result){
+						 console.log('Second Delete error ') ; 
+						 res.status(500).json({}) 
+					 }else
+					 {
+						 var query3 = 'select distinct group_user , group_owner from palash.user_groups_mapping t2 , palash.users_groups t1 where t1.group_name = t2.group_name and t1.group_name =  ? ' ;
+						 var params3 = [groupname] ;
 						 
-						 fetchDataQuery(connection, query2 , params2 , function(result){
+						 fetchDataQuery(connection, query3 , params3 , function(result1){
 							 if(result == null ){
 								 res.status(500).json({})
 							 }else{
-								 res.status(200).json({grouplist : result}) 
+								 
+								 var query4 = 'select filename , file_owner , t1.group_name , file_directory  from palash.user_groups_mapping t1 ,palash.group_files t2 where t1.group_name = ?   and t1.group_name = t2.group_name  and group_user = ?  ' ;
+								 var params4 = [  groupname , email ]  ;
+								 
+								 fetchDataQuery(connection , query4 , params4 , function(result){
+									 console.log('Result ' , result )
+									 if(result == null){
+										 res.status(500).json({})
+									 }else{
+										
+										 res.status(200).json({filelist : result , groupMemberList : result1})
+									 }
+								 })
+								 
+								
 							 }
 						 })
+						 
 					 }
 				 })
-				 
-				 
-				 
-				 
-				 
-				 
-			 }
-			 
-			 
-			 
-			 
-			 
-			 
-		 })
+				 }
+		})
 		 
 	 })
+	 
+	 
 	 
 	 
 	 app.post('/submitProfile',  function(req, res) {
@@ -380,7 +456,7 @@ module.exports = function(app){
 	app.post('/getAllGroups',  function(req, res) {
 		 var email = req.body.email ;
 		 
-		 query1 = 'select * from user_groups_mapping where group_user = ? ' ;
+		 query1 = 'select * from palash.user_groups_mapping t2 ,palash.users_groups t1 where group_user = ?  and t1.group_name = t2.group_name ' ;
 		 params1 = [email] ;
 		 
 		 fetchDataQuery(connection , query1 , params1 , function(result){
@@ -397,7 +473,7 @@ module.exports = function(app){
 		 var email = req.body.email ;
 		 var groupname = req.body.groupname ;
 		
-		 var query1 = 'select distinct group_user  from palash.user_groups_mapping t2 , palash.users_groups t1 where t1.group_name = t2.group_name and t1.group_name =  ? ' ;
+		 var query1 = 'select distinct group_user , group_owner from palash.user_groups_mapping t2 , palash.users_groups t1 where t1.group_name = t2.group_name and t1.group_name =  ? ' ;
 		 var params1 = [groupname] ;
 		 
 		 fetchDataQuery(connection, query1 , params1 , function(result){
@@ -512,33 +588,48 @@ module.exports = function(app){
 		 var filename = req.body.filename ;
 		 var directory = req.body.directory ;
 		 
-		 var query1 = 'select * from group_files where group_name = ? and file_owner = ? and filename = ? and file_directory = ?' ;
-		 var params1 = [groupname , email , filename , directory ] ; 
+		 var query0 = "select group_owner from palash.users_groups where group_name =  ? ";
+		 var params0 = [groupname] ; 
 		 
-		 CheckIfExistQuery(connection , query1 , params1 , function(result){
-			 if(result){
+		 fetchDataQuery(connection , query0 , params0 , function(result){
+			 if(result === null){
 				 res.status(500).json({})
 			 }else{
-				 var params2 = [[[groupname , email , filename , directory  ]]];
-				 var query2 = 'insert into group_files (group_name, file_owner , filename , file_directory) VALUES ?' ;
+				 console.log('Group Owner ' , result[0].group_owner);
+				 var owner =  result[0].group_owner ; 
+				 var query1 = 'select * from group_files where group_name = ? and file_owner = ? and filename = ? and file_directory = ?' ;
+				 var params1 = [groupname , email , filename , directory ] ; 
 				 
-				 InserQuery(connection , query2 , params2 , function(result){
-					 if(!result){
-						 res.status(500).json({success : false})
+				 
+				 
+				 CheckIfExistQuery(connection , query1 , params1 , function(result){
+					 if(result){
+						 res.status(500).json({})
 					 }else{
-						 connection.query('select * from group_files '  ,
-									function(err , rows , fields ){
-										if(err) {
-											console.log('Error 3 ') ;
-											res.status(500).json({})
-										
-										}else{
-											res.status(200).json({groupFileList : rows})
-										}})
-						 	}
+						 var params2 = [[[groupname , email , filename , directory , owner ]]];
+						 var query2 = 'insert into group_files (group_name, file_owner , filename , file_directory, group_owner) VALUES ?' ;
+						 
+						 InserQuery(connection , query2 , params2 , function(result){
+							 if(!result){
+								 res.status(500).json({success : false})
+							 }else{
+								 connection.query('select * from group_files '  ,
+											function(err , rows , fields ){
+												if(err) {
+													console.log('Error 3 ') ;
+													res.status(500).json({})
+												
+												}else{
+													res.status(200).json({groupFileList : rows})
+												}})
+								 	}
+						 })
+					}
 				 })
-			}
+			 }
 		 })
+		 
+		 
 	})
 	 
 	
@@ -580,8 +671,8 @@ module.exports = function(app){
 								 res.status(500).json({})
 							 }else{
 								 var params5 = [email];
-								 var query5 = 'select * from user_groups_mapping where group_user = ? ';
-								 
+								 var query5 = 'select * from palash.user_groups_mapping t2 ,palash.users_groups t1 where group_user = ?  and t1.group_name = t2.group_name';
+								 				
 								 fetchDataQuery(connection , query5 , params5 , function(result){
 									 if(result == null ){
 										 res.status(500).json({})
@@ -732,33 +823,54 @@ module.exports = function(app){
 								[ email , filename , directory] ,   function (error, results, fields) {
 						    if (error) throw error;
 						    else{
-						    	  console.log('File deleted from Database , The response is: ', results);
-						    	  
-						    	  //Returning two objects for Starred and All Items
-						    	  //First - ALl files
-						    	  var pathOfUser = path;
-						 		
-						    	  if (fs.existsSync(pathOfUser)) {
-						 			
-						    		  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ?' ;
-										 
-									  connection.query(query ,[email, directory] ,  function(err , rows , fields){
-											if(err ) throw err ;
-											else{
+						    	
+						    	var query1 = "delete from palash.user_shared_files where from_user = ?" ;
+						    	var params1 = [email]; 
+						    	DeleteQuery(connection , query1 , params1 , function(result){
+						    		if(!result){
+						    			res.status(500).json({})
+						    		}else{
+						    			
+						    			var query2 = "delete from palash.group_files where filename= ? and file_directory = ? and file_owner = ? " ;
+								    	var params2 = [filename , directory , email]; 
+						    			
+								    	DeleteQuery(connection , query2 , params2 , function(result){
+								    		if(!result){
+								    			res.status(500).json({})
+								    		}else{
+								    			 var pathOfUser = path;
+											 		
+										    	  if (fs.existsSync(pathOfUser)) {
+										 			
+										    		  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ?' ;
+														 
+													  connection.query(query ,[email, directory] ,  function(err , rows , fields){
+															if(err ) throw err ;
+															else{
 
-												var allData = rows ; 
-												var queryForUser = 'select file_name,directory,starred from user_files where starred=\'1\' and email = ? and directory = ? ' ; 
-							 					
-							 					 console.log(queryForUser) ; 
-							 					 connection.query(queryForUser ,[email, directory] ,  function(err , rows , fields){
-							 						if(err ) throw err ;
-							 						else{
-							 							res.status(200).json({starred_data : rows , filelist : allData})
-							 						}
-							 					})
-											}
-										})
+																var allData = rows ; 
+																var queryForUser = 'select file_name,directory,starred from user_files where starred=\'1\' and email = ? and directory = ? ' ; 
+											 					
+											 					 console.log(queryForUser) ; 
+											 					 connection.query(queryForUser ,[email, directory] ,  function(err , rows , fields){
+											 						if(err ) throw err ;
+											 						else{
+											 							res.status(200).json({starred_data : rows , filelist : allData})
+											 						}
+											 					})
+															}
+														})
+										    		}
+										    
+								    		}
+								    	})
+						    			
+						    			
 						    		}
+						    	})
+						    	
+						    	
+						    	
 						    }
 						  });
 					}

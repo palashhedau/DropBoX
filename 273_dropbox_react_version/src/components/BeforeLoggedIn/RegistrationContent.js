@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import {register} from '../../actions/registrationAction'
+import {register , setBackRegistered} from '../../actions/registrationAction'
 import { connect } from 'react-redux' ; 
+import { Link } from 'react-router-dom'
 
 
 
@@ -15,7 +16,8 @@ class RegistrationContent extends Component{
 			fname : '' ,
 			lname : '',
 			dob : '' ,
-			gender : ''
+			gender : '',
+			error : ''
 		}
 	}
 
@@ -26,8 +28,11 @@ class RegistrationContent extends Component{
 
    componentDidUpdate(prevProps, prevState) {
    	if(this.props.registered){
+   		this.props.setBackRegistered();
       	this.props.history.push('/login');
       }
+
+
   	}
 
 
@@ -71,138 +76,162 @@ class RegistrationContent extends Component{
 	render(){
 		console.log('Registration success : ' , this.props.registered) ; 
 		
+		const styleColor = {
+			color: "red"
+		}
 
-		
+
+		const sharpCorner = {
+			borderRadius : "0"
+		}
+
+		const paddingTop = {
+			paddingTop: "40px"
+		}
 		
 		return (
 			
-		<div className="panel panel-info " >
-					<div className="panel-heading">
-				        	<h4 >Register</h4>
-					</div>
-				 
-				 <div className="panel-body">
+		
 				 <form onSubmit={this.handleSubmit} encType="multipart/form-data">
 					<div>
 					
-						<div className="row padd">
-							<div className='form-group'>
-								<div className='col-lg-2 '></div>
-								<div className='col-lg-2 col-md-1 col-sm-12' >
-									<label htmlFor='username' className="label label-primary" >Email :</label>
-								</div>
-								<div className='col-lg-3 col-md-2 col-sm-12'>
-									<input type="email"  onChange={this.onChangeEmail.bind(this)} name='email' id='email'   className="form-control"  placeholder="Email..." aria-describedby="basic-addon1"  required />
-								</div>
-								<div className='col-lg-5'></div>
-							</div>
-						</div>
-						
-						<div className="row padd">
-							<div className='form-group'>
-								<div className='col-lg-2'></div>
-								<div className='col-lg-2 col-md-1 col-sm-12'>
-									<label htmlFor='password' className="label label-primary" >Password :</label>
-								</div>
-								<div className='col-lg-3 col-md-2 col-sm-12'>
-									<input type="password" onChange={this.onChangePassword.bind(this)} name='password' id='password'   className="form-control"  placeholder="Password..." aria-describedby="basic-addon1"  required />
-								</div>
-								<div className='col-lg-5'></div>
-							</div>
-						</div>
-						
-						
-						
-						
-						<div className="row padd">
-						<div className='form-group'>
-							<div className='col-lg-2'></div>
-							<div className='col-lg-2 col-md-1 col-sm-12' >
-								<label htmlFor='fname' className="label label-primary" >First Name :</label>
-							</div>
-							<div className='col-lg-3 col-md-2 col-sm-12'>
-									<input type="text" onChange={this.onChangeFname.bind(this)} name='fname' id='fname'   className="form-control"  placeholder="First Name..." aria-describedby="basic-addon1"  required />
-								</div>
-							<div className='col-lg-5'></div>
-						</div>
-						</div>
-						
-						<div className="row padd">
-						<div className='form-group'>
-							<div className='col-lg-2'></div>
-							<div className='col-lg-2 col-md-1 col-sm-12' >
-								<label htmlFor='lname' className="label label-primary" >Last Name :</label>
-							</div>
-							<div className='col-lg-3 col-md-2 col-sm-12'>
-									<input type="text" onChange={this.onChangeLname.bind(this)} name='lname' id='lname'   className="form-control"  placeholder="Last Name..." aria-describedby="basic-addon1"  required />
-								</div>
-							<div className='col-lg-5'></div>
-						</div>
-						</div>
-						
-						<div className="row padd">
-						<div className='form-group'>
-							<div className='col-lg-2'></div>
-							<div className='col-lg-2 col-md-1 col-sm-12' >
-								<label htmlFor='dob' className="label label-primary" >DOB :</label>
-							</div>
-							<div className='col-lg-3 col-md-2 col-sm-12'>
-									<input type="date" name='dob' id='dob' onChange={this.onChangeDOB.bind(this)}  className="form-control"  placeholder="DOB..." aria-describedby="basic-addon1"  required />
-								</div>
-							<div className='col-lg-5'></div>
-						</div>
-						</div>
-						
-						<div className="row padd">
-						<div className='form-group'>
-							<div className='col-lg-2'></div>
-							<div className='col-lg-2 col-md-1 col-sm-12' >
-								<label htmlFor='lname' className="label label-primary" >Gender :</label>
-							</div>
-							<div className='col-lg-4 col-md-4 col-sm-12' >
-								<div className="radio-group" >
-									<div className="radio">
-
-									  <label ><input type="radio" name="optradio" required value='Male' onChange={this.onChangeGender.bind(this)}/>Male </label>
-									  <label><input type="radio" name="optradio" required value='Female' onChange={this.onChangeGender.bind(this)}/>Female </label>
-									  <label><input type="radio" name="optradio" required value='Other' onChange={this.onChangeGender.bind(this)}/>Other </label>
-								 	</div >
-								</div>
+						<div  className="row  col-sm-12 col-lg-12 col-md-12 foo " style={paddingTop}>
+					
+							
+							<div className="row padd">
+									<div className='col-lg-12 col-md-12 col-sm-12'>
+										<h2>Sign up</h2>		
+									</div>
+									<div className='col-lg-12 col-md-12 col-sm-12'>
+										or <Link to="/login">sign in to your account</Link>		
+									</div>
 							</div>
 
+							<div className="row padd">
+									<div className='col-lg-12 col-md-12 col-sm-12'>
+											<input style={sharpCorner} type="email"  onChange={this.onChangeEmail.bind(this)} name='email' id='email'   className="form-control"  placeholder="Email..." aria-describedby="basic-addon1"  required />
+										</div>
+							</div>
+							
+							<div className="row padd">
+									<div className='col-lg-12 col-md-12 col-sm-12'>
+											<input style={sharpCorner} type="password" onChange={this.onChangePassword.bind(this)} name='password' id='password'   className="form-control"  placeholder="Password..." aria-describedby="basic-addon1"  required />
+										</div>
+							</div>
+								
+							<div className="row padd">
+								<div className='col-lg-12 col-md-12 col-sm-12'>
+											<input style={sharpCorner} type="text" onChange={this.onChangeFname.bind(this)} name='fname' id='fname'   className="form-control"  placeholder="First Name..." aria-describedby="basic-addon1"  required />
+								</div>
+							</div>
+								
+							<div className="row padd">
+								<div className='col-lg-12 col-md-12 col-sm-12'>
+										<input style={sharpCorner} type="text" onChange={this.onChangeLname.bind(this)} name='lname' id='lname'   className="form-control"  placeholder="Last Name..." aria-describedby="basic-addon1"  required />
+								</div>
+							</div>
+								
+							<div className="row padd">
+								<div className='col-lg-12 col-md-12 col-sm-12'>
+										<input style={sharpCorner} type="date" name='dob' id='dob' onChange={this.onChangeDOB.bind(this)}  className="form-control"  placeholder="DOB..." aria-describedby="basic-addon1"  required />
+								</div>
+							</div>
+								
+							<div className="row padd">
+								<div className='col-lg-12 col-md-12 col-sm-12' >
+										<div className="radio-group" >
+											<div className="radio">
+
+											  <label ><input type="radio" name="optradio" required value='Male' onChange={this.onChangeGender.bind(this)}/>Male </label>
+											  <label><input type="radio" name="optradio" required value='Female' onChange={this.onChangeGender.bind(this)}/>Female </label>
+											  <label><input type="radio" name="optradio" required value='Other' onChange={this.onChangeGender.bind(this)}/>Other </label>
+										 	</div >
+										</div>
+								</div>
+							</div>
+								
+								
+							<div className="row padd">
+								
+									<div className='col-lg-12 col-md-12 col-sm-12'>
+										<button  style={sharpCorner} className='btn btn-info btn-block' onClick={() => {
+											console.log('DOB ' , this.state.dob)
+											console.log('DOB ' , this.state.gender)
+											var email_regex = /^[a-z0-9]{3,10}@[a-z]+\.[a-z]+$/i ; 
+											var name_regex = /^[a-z]{5,10}$/i ;
+											var lname_regex = /^[a-z]{5,10}$/i ;
+											var password_regex = /^[a-z0-9]{5,20}$/i ; 
+
+											if(!email_regex.test(this.state.email)){
+												this.setState({
+													error : 'Enter proper email format'
+												})
+												return ;
+											}
+											if(!password_regex.test(this.state.password)){
+												this.setState({
+													error : 'Password should be alpha-numeric and 5-20 characters'
+												})
+												return ;
+											}
+											if(!name_regex.test(this.state.fname)){
+												this.setState({
+													error : 'First Name should contain only letters and 5-10 characters only'
+												})
+												return ;
+											}
+											if(!lname_regex.test(this.state.lname)){
+												this.setState({
+													error : 'Last Name should contain only letters and 5-10 characters only'
+												})
+												return ;
+											}
+											if(this.state.dob === ''){
+												this.setState({
+													error : 'Select Date of Birth'
+												})
+												return ;
+											}
+											if(this.state.gender === ''){
+												this.setState({
+													error : 'Select Gender'
+												})
+												return ;
+											}
+
+											
+											this.props.register(this.state.email,
+																this.state.password,
+																this.state.fname,
+																this.state.lname,
+																this.state.dob,
+																this.state.gender)
 
 
+										}} >Submit</button>
+									</div>
+									
+							</div>
+							
+							<div className="row padd">
+								<div className='col-lg-12 col-md-12 col-sm-12' >
+										{ 
+											this.state.error === '' ? <b></b> :
+											<h4 style={styleColor}>{this.state.error}</h4>
+										}
+								</div>
+							</div>
+							
 							
 						</div>
-						</div>
-						
-						
-						<div className="row padd">
-						<div className='form-group'>
-							<div className='col-lg-2'></div>
-							<div className='col-lg-2 col-md-1 col-sm-12'>
-							</div>
-							<div className='col-lg-2 col-md-2 col-sm-12'>
-								<button className='btn btn-info' onClick={() => {
-									this.props.register(this.state.email,
-														this.state.password,
-														this.state.fname,
-														this.state.lname,
-														this.state.dob,
-														this.state.gender)
-								}}>Submit</button>
-							</div>
-							<div className='col-lg-5'></div>
-						</div>
-						</div>
-						
+
+
 					
 					
 					</div>
 					
 				</form>
-				</div>
-				</div>
+				
 
 
 			)
@@ -219,7 +248,8 @@ class RegistrationContent extends Component{
 function mapDispatchToProps(dispatch) {
     return {
         register : (data1 , data2 , data3, data4, data5, data6 ) => dispatch(register( 
-        									data1 , data2 , data3, data4, data5, data6 ))
+        									data1 , data2 , data3, data4, data5, data6 )),
+        setBackRegistered : () => dispatch(setBackRegistered())
     };
 }
 
