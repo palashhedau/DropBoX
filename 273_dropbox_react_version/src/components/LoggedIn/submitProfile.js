@@ -59,7 +59,7 @@ class SubmitProfile extends Component{
 				
 				
 
-				<div className="row col-sm-11 col-lg-11 col-md-11 col-xs-11">
+				<div className="row col-sm-12 col-lg-12 col-md-12 col-xs-12">
 		
                     
 

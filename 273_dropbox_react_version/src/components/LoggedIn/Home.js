@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter  } from 'react-router-dom'
 import { logout  } from '../../actions/authAction'
-import { uploadFile , getAllFiles } from '../../actions/uploadFileAction'
+import { uploadFile , getAllFiles , getRecentFiles } from '../../actions/uploadFileAction'
 import { connect } from 'react-redux' ; 
 import {getAllStarredFiles} from '../../actions/StarredAction'
 import {createFolder} from '../../actions/CreateFolderAction'
@@ -27,6 +27,7 @@ class Home extends Component{
 							(	this.props.location.pathname.indexOf("/groups") === 0 ? 'root' :
 							(	this.props.location.pathname.indexOf("/shared") === 0 ? 'root' :
 								this.props.location.pathname.indexOf("/profile") === 0 ? 'root' :
+								this.props.location.pathname.indexOf("/file_activity") === 0 ? 'root' :
 								this.props.location.pathname.replace('/home/' , ''))))),
 			
 
@@ -61,6 +62,8 @@ class Home extends Component{
    	  	heading = 'Profile : ' + this.props.location.pathname.replace('/profile/' , '')
    	  else if(this.state.directoryForHeading.indexOf( '/profile_details') === 0  )
    	  	heading = 'Enter your Details' 
+   	  else if(this.state.directoryForHeading.indexOf( '/file_activity') === 0  )
+   	  	heading = 'File Activities' 
    	  else
    	  	heading = 'Sub-directories'
 
@@ -70,6 +73,7 @@ class Home extends Component{
    	  this.props.setHomeHeading(heading) ;
       this.props.getAllFiles(this.props.email,'',this.state.directory) ; 
       this.props.getAllStarredFiles(this.props.email , this.state.directory);
+      this.props.getRecentFiles(this.props.email) ; 
       this.props.setDirectory(this.state.directory);
       this.props.getAllUsers(this.props.email) ;
       this.props.getAllGroups(this.props.email) ; 
@@ -198,6 +202,8 @@ class Home extends Component{
 						     </div>
 						     <div style={styleDivForleftpanel}>
 					  			<Link  to="/profile_details" ><p style={fontSize}>Profile</p></Link>
+						     </div> <div style={styleDivForleftpanel}>
+					  			<Link  to="/file_activity" ><p style={fontSize}>Activity Report</p></Link>
 						     </div>
 					  	</div>
 
@@ -238,7 +244,7 @@ class Home extends Component{
 
 					     <div className="row col-lg-12">
 					     		
-					     		<div className="col-lg-9">
+					     		<div className="col-lg-9 ">
 					     		<InnerComp {...this.props}> </InnerComp>
 					     		</div>
 					     		
@@ -248,7 +254,11 @@ class Home extends Component{
 								      		<label className="btn btn-primary btn-file btn-block">
 											    Upload Files <input type="file" onChange={(e) => {
 											    	var file = e.target.files[0];
-											    	
+											    	console.log('File to be uploaded ' , file ) ; 
+
+											    	if(file === undefined){
+											    		return ; 
+											    	}
 											    	this.props.uploadFile(this.props.email , file , file.name , this.state.directory);
 											    }} style={styleDisplayNone}/>
 											</label>
@@ -287,7 +297,7 @@ class Home extends Component{
 
 
 									<div className="row text-left" style={padding50}>
-									      	<Link to="/shared">Shared Files</Link>
+									      	<Link to="/shared">Shared Section</Link>
 									</div>
 									<div className="row text-left" style={padding50}>
 						      			<a data-toggle="modal" data-target="#createGroup">
@@ -350,7 +360,8 @@ function mapDispatchToProps(dispatch) {
         createGroup : (groupowner , groupname) => dispatch(createGroup(groupowner,groupname)),
         getAllGroups : (email) => dispatch(getAllGroups(email)),
         getAllSharedGroupComponents : (email , directory ) => dispatch(getAllSharedGroupComponents(email,directory)),
-        getMembersOfGroup : (email , groupname) => dispatch(getMembersOfGroup(email , groupname))
+        getMembersOfGroup : (email , groupname) => dispatch(getMembersOfGroup(email , groupname)),
+        getRecentFiles : (email ) => dispatch(getRecentFiles(email)) 
     };
 }
 

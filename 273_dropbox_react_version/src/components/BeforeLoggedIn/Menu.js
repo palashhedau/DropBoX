@@ -56,11 +56,11 @@ export default function Landing2 (InnerComponent ){
 		return(
 
 			<div className="container-fluid" style={paddLeftDiv}>
-				<div className="col-lg-12 foo" style={height}>
-						<div className="col-lg-8 col-md-8 col-sm-8 foo" style={height}>
+				<div className="col-lg-12 " style={height}>
+						<div className="col-lg-8 col-md-8 col-sm-8 " style={height}>
 							<img alt="" src={require("../../fonts/Polbox_FrontPage.JPG")}/>
 						</div>
-						<div className="col-lg-4 col-md-4 col-sm-4 foo" style={paddleft}>
+						<div className="col-lg-4 col-md-4 col-sm-4 " style={paddleft}>
 							
 							<InnerComponent {...this.props}></InnerComponent>
 						</div>

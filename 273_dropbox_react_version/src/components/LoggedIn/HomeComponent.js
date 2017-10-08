@@ -24,13 +24,13 @@ class HomeComponent extends Component{
 		
 
 		const styleBottomBorder = {
-			borderBottom: "1px solid#888",
+			borderBottom: "1px solid rgb(220, 220,220 )",
 			paddingTop:"15px"
 		}
 
 		
 
-		var listOfAUserFiles = this.props.listOfFiles.map((file , key) => {
+		var listOfAUserFiles = this.props.listOfRecentFiles.map((file , key) => {
 			return <FileComponent key={key} file={file} > </FileComponent>
 		})
 
@@ -42,7 +42,7 @@ class HomeComponent extends Component{
 				
 				
 
-				<div className=" col-sm-11 col-lg-11 col-md-11 col-xs-11" >
+				<div className=" col-sm-12 col-lg-12 col-md-12 col-xs-12" >
 					      	  
 					      	   <div className="row" style={styleBottomBorder}>
 					      		<p>Starred</p>
@@ -91,7 +91,7 @@ function mapStateToProps(state) {
         listOfFiles : state.fileUploadReducer.listOfFiles,
         fileContent : state.getClickedFileDataReducer.fileData, 
         listOfSTarredFiles : state.fileUploadReducer.listOfStarredFiles,
-        
+        listOfRecentFiles : state.fileUploadReducer.listOfRecentFiles
     };
 }
 

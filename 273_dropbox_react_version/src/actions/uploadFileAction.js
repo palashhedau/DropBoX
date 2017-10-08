@@ -14,7 +14,7 @@ export function uploadFile(email , file , name , directory )  {
 		 axios.post('http://localhost:3002/upload' , data  )
 	  .then(function (response) {
 	  	console.log("Response after upload " , response.data)
-	  	dispatch({type : 'FILE_UPLOAD_SUCCESS' , payload : response.data.filelist})
+	  	dispatch({type : 'FILE_UPLOAD_SUCCESS' , payload : response.data})
 	  })
 	  .catch(function (error) {
 	    dispatch({type : 'FILE_UPLOAD_FALIURE' , payload : error})
@@ -54,6 +54,7 @@ export function deleteFile(email , filename , directory  )  {
 		 }  )
 	  .then(function (response) {
 	  	
+	  	console.log('Recent Item Data ' , response.data.recent_files)
 	  	dispatch({type : 'DELETE_FILE_SUCCESS' , payload : response.data})
 	  })
 	  .catch(function (error) {
@@ -62,3 +63,20 @@ export function deleteFile(email , filename , directory  )  {
 	}
 }
 
+
+
+export function getRecentFiles(email   )  {
+	
+	 return  function(dispatch){
+		 axios.post('http://localhost:3002/readRecentfiles' , {
+		 	email : email 
+		 }  )
+	  .then(function (response) {
+	  	console.log('Recent Files brought' , response.data)
+	  	dispatch({type : 'GET_RECENT_FILES_SUCCESS' , payload : response.data})
+	  })
+	  .catch(function (error) {
+	    console.log('Error while deleting ' , error)
+	  })
+	}
+}

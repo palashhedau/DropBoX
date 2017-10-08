@@ -7,6 +7,7 @@ import CurrentDirectoryReducer from './CurrentDirectoryReducer'
 import HomeReducer from './HomeReducer'
 import groupsReducer from './groupsReducer'
 import profileReducer from './profileReducer'
+import HistoryItemReducer from './HistoryItemReducer'
 
 export default combineReducers({
 	AuthReducer,
@@ -16,5 +17,6 @@ export default combineReducers({
 	CurrentDirectoryReducer,
 	HomeReducer,
 	groupsReducer,
-	profileReducer
+	profileReducer,
+	HistoryItemReducer
 })

@@ -50,7 +50,7 @@ class LoginContent  extends Component{
 
 		return(
 			
-				<div  className="row  col-sm-12 col-lg-12 col-md-12 foo " style={paddingTop}>
+				<div  className="row  col-sm-12 col-lg-12 col-md-12 " style={paddingTop}>
 										
 										<div className="row padd">
 												<div className='col-lg-12 col-md-12 col-sm-12'>

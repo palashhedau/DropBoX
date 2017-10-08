@@ -20,6 +20,7 @@ import GroupsContent from './components/LoggedIn/GroupsContent'
 import profile from './components/LoggedIn/profile'
 import SubmitProfile from './components/LoggedIn/submitProfile'
 import Landing2 from './components/BeforeLoggedIn/Menu'
+import FileHistory from './components/LoggedIn/FileHistory'
 
 const Main = () => (
   
@@ -34,7 +35,7 @@ const Main = () => (
           <Route path="/groups" exact component={AuthenticateRouth(Home(Groups))}/>
           <Route path="/profile/:membername" exact component={AuthenticateRouth(Home(profile))}/>
           <Route path="/groups/:groupname" component={AuthenticateRouth(Home(GroupsContent))}/>
-
+          <Route path="/file_activity" component={AuthenticateRouth(Home(FileHistory))}/>
     </Switch>
   
 )

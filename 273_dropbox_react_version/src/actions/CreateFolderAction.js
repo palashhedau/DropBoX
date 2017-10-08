@@ -12,7 +12,7 @@ export function createFolder(email , foldername , directory )  {
 	  .then(function (response) {
 	  	
 	  	console.log('FIle list after folder upload ' , response.data) ; 
-	  	dispatch({type : 'CREATE_FOLDERNAME_SUCCESS' , payload : response.data.filelist })
+	  	dispatch({type : 'CREATE_FOLDERNAME_SUCCESS' , payload : response.data })
 	  })
 	  .catch(function (error) {
 	    dispatch({type : 'CREATE_FOLDERNAME_FAILURE' , payload : error})

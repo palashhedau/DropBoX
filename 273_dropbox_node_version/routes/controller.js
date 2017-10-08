@@ -107,7 +107,7 @@ module.exports = function(app){
 	
 		app.post('/readallStarredfiles',  function(req, res) {
 			 var email = req.body.email ; 
-			 var query = 'select file_name , directory,starred from user_files where starred=\'1\' and email = ? ' ; 
+			 var query = 'select file_name , directory,starred from user_files where starred=\'1\' and email = ? and is_deleted = \'0\' ' ; 
 			 var directory = req.body.directory ; 
 			 var params = [email] ; 
 			 
@@ -124,7 +124,7 @@ module.exports = function(app){
 		 var directory = req.body.directory ; 
 		 console.log('Directory ' , directory )
 		 
-		 var query = 'select file_name, directory,starred from user_files where email = ? and directory = ?' ;
+		 var query = 'select file_name, directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\' ' ;
 		 
 		  
 		if(directory === 'root'){
@@ -141,6 +141,19 @@ module.exports = function(app){
 	})
 	
 	
+	app.post('/readRecentfiles',  function(req, res) {
+		 var email = req.body.email ; 
+		
+		 var query = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+		
+		fetchDataQuery(connection , query ,[email] , function(result){
+			res.status(200).json({recent_items : result})
+		} )
+		
+	})
+	
+	
+	
 	app.post('/unStarfile',  function(req, res) {
 		 var email = req.body.email; 
 		 var file_name = req.body.filename ;
@@ -148,21 +161,34 @@ module.exports = function(app){
 		 console.log('Directory ' , directory )
 		 
 		 console.log('Star file params ' , email , file_name , directory ) ; 
-		 var updateQuery = 'UPDATE user_files SET starred = ? WHERE email = ? and file_name = ? ' ;
+		 var updateQuery = 'UPDATE user_files SET starred = ? WHERE email = ? and file_name = ? and is_deleted = \'0\' ' ;
 		 var params =  [false , email , file_name , directory] ; 
 		 
 		 UpdateQuery(connection ,updateQuery , params , function(result){
 			 if(result){
-				  var query1 = 'select file_name , directory,starred from user_files where starred=\'1\' and email = ? ';
+				  var query1 = 'select file_name , directory,starred from user_files where starred=\'1\' and email = ? and is_deleted = \'0\' ';
 				  var params1 = [email] ; 
 				  
 				  
 				  fetchDataQuery(connection , query1 , params1 , function(result1){
-					  var query2 = 'select file_name,directory,starred from user_files where email = ? and directory = ?' ;
+					  var query2 = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
 					  var params2 = [email, directory] ; 
 					  
 					  fetchDataQuery(connection , query2 , params2 , function(result2){
-						  res.status(200).json({starred_data : result1 , filelist : result2})
+						  if(result === null){
+							  
+						  }else{
+							  
+								
+								 var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+								
+								fetchDataQuery(connection , query11 ,[email] , function(result3){
+									res.status(200).json({starred_data : result1 , filelist : result2 , recent_files : result3})
+								} )
+						  }
+						  
+						  
+						  
 					  })
 					  
 				  })
@@ -184,14 +210,14 @@ module.exports = function(app){
 		 var params1 = [true , email, file_name , directory ] ;
 		 
 		 
-		 var query0 = "select starred from user_files WHERE email = ? and file_name= ? and directory = ? " ;
+		 var query0 = "select starred from user_files WHERE email = ? and file_name= ? and directory = ? and is_deleted = \'0\' " ;
 		 params0 = [email, file_name , directory]
 		 fetchDataQuery(connection, query0, params0, function(result) {
 		 	if(result === null){
 		 		
 		 	}else{
 		 		
-		 		var query1 = 'UPDATE user_files SET starred = ? WHERE email = ? and file_name= ? and directory = ?' ;
+		 		var query1 = 'UPDATE user_files SET starred = ? WHERE email = ? and file_name= ? and directory = ? and is_deleted = \'0\'' ;
 		 		
 		 		if(result[0].starred == 0){
 		 			var params1 = [true , email, file_name , directory ] ;
@@ -201,15 +227,26 @@ module.exports = function(app){
 		 		 UpdateQuery(connection , query1 , params1 , function(result1){
 					 if(result1){
 						 
-						 var query2 = 'select file_name ,directory ,starred  from user_files where starred=\'1\' and email = ? ' ; 
+						 var query2 = 'select file_name ,directory ,starred  from user_files where starred=\'1\' and email = ? and is_deleted = \'0\' ' ; 
 						 var params2 = [email ] ; 
 						 
 						 fetchDataQuery(connection , query2 , params2 , function(result2){
-							 var query3 = 'select file_name,directory,starred from user_files where email = ? and directory = ?' ;
+							 var query3 = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\' ' ;
 							 var params3 = [email, directory] ; 
 							 
 							 fetchDataQuery(connection , query3 , params3 , function(result3){
-								 res.status(200).json({starred_data : result2 , filelist : result3})
+								if(result === null){
+									
+								}else{
+									var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+									
+									fetchDataQuery(connection , query11 ,[email] , function(result4){
+										res.status(200).json({starred_data : result2 , filelist : result3 , recent_files : result4})
+									} )
+									
+								}
+								 
+								 
 							 })
 							 
 						 })
@@ -276,6 +313,23 @@ module.exports = function(app){
 	 app.post('/getProfile',  function(req, res) {
 		 var email = req.body.email ;
 		 var query = 'select * from user_profile where email = ? ' ;
+		 var params = [email]  ; 
+		
+		 fetchDataQuery(connection , query , params , function(result){
+			 if(result == null){
+				 res.status(500).json({ profile : 'Error while getting profile ' })
+			 }else{
+				 res.status(200).json({ profile : result })
+			 }
+			 
+		 })
+	})
+	
+	
+	
+	 app.post('/getFilesHistory',  function(req, res) {
+		 var email = req.body.email ;
+		 var query = 'select * from palash.user_files where is_deleted = \'1\'  and email = ? order by file_add_date  ' ;
 		 var params = [email]  ; 
 		
 		 fetchDataQuery(connection , query , params , function(result){
@@ -544,6 +598,13 @@ module.exports = function(app){
 			var is_directory = true ; 
 			
 			
+			var currentdate = new Date();
+			var datetime =  currentdate.getFullYear() + '-' + currentdate.getMonth() + '-' + currentdate.getDay() + " "+ 
+			currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
+			
+			var is_deleted = false ; 
+			
+			
 			
 		 if(!fs.existsSync(path)){
 			 fs.mkdirSync(path , 0744);
@@ -553,22 +614,28 @@ module.exports = function(app){
 		 if (!fs.existsSync(folderPath)) {
 			 fs.mkdirSync(folderPath , 0744);
 			 
-			 var params1 = [[[email , foldername , starred , is_directory , directory ]]];
-			 var query1 = 'insert into user_files (email,file_name,starred,is_directory, directory) VALUES ?' ;
+			 var params1 = [[[email , foldername , starred , is_directory , directory , datetime , is_deleted ]]];
+			 var query1 = 'insert into user_files (email,file_name,starred,is_directory, directory , file_add_date , is_deleted) VALUES ?' ;
 			 
 			 InserQuery(connection , query1 , params1 , function(result){
 				 if(!result){
 					 console.log('Error occured ');
 					 res.status(400).json({ success : false , error : ''})
 				 }else{
-					 var query2 = 'select file_name, directory,starred from user_files where email = ? and directory = ?' ;
+					 var query2 = 'select file_name, directory,starred from user_files where email = ? and directory = ? and is_deleted=\'0\' ' ;
 					 var params2 = [email, directory] ; 
 				 
 					 fetchDataQuery(connection , query2 , params2 , function(result){
 						 if(result == null){
 							 res.status(400).json({ success : false , error : ''})
 						 }else{
-							 res.status(200).json({filelist : result})
+							 
+							 var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+								
+								fetchDataQuery(connection , query11 ,[email] , function(result4){
+									res.status(200).json({filelist : result , recent_files : result4})
+								} )
+							 
 						 }
 					 })
 				 
@@ -705,6 +772,13 @@ module.exports = function(app){
 		
 		console.log('Directory : ' , directoryToUpload) ; 
 		
+		var currentdate = new Date();
+		var datetime =  currentdate.getFullYear() + '-' + (currentdate.getMonth()+1) + '-' + currentdate.getDate() + " "+ 
+		currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
+		
+		console.log('Datetime for upload ' , datetime) ; 
+		
+		var is_deleted = false ; 
 		
 		//File Folder
 		if(directoryToUpload === 'root'){
@@ -713,70 +787,92 @@ module.exports = function(app){
 			var path = 'public/Images/'+email+'/' + directoryToUpload;
 		}
 		
-		console.log('Path -------- ' , path) ; 
+		console.log('Path ------- ' , path) ; 
 		
 		//File
 		if(req.files){
 			var file  = req.files.file ;
 			var filename  = file.name ; 
 			
-			if (fs.existsSync(path)) {
-				file.mv(path +'/'+filename , function(err){
-					if(err)throw err ;
-					else{
-						var userFileObject = [[email , filename , starred , is_directory , directoryToUpload]];
-						
-						connection.query('insert into user_files (email,file_name,starred,is_directory, directory) VALUES ?',[userFileObject] ,
-								function(err , result ){
-							if(err) throw err ; 
+			
+			CheckIfExistQuery(connection, "select * from user_files where email = ?  and file_name = ? and directory = ? "
+					, [email , filename ,  directoryToUpload ,  ], function(result) {
+				if(!result){
+					if (fs.existsSync(path)) {
+						file.mv(path +'/'+filename , function(err){
+							if(err)throw err ;
 							else{
-								if (fs.existsSync(path)) {
-									  var query = 'select file_name ,directory,starred from user_files where email = ? and directory = ?' ;
-										 
-									  connection.query(query ,[email, directoryToUpload] ,  function(err , rows , fields){
-											if(err ) throw err ;
-											else{
-												console.log("Starred elements " , rows); 
-												res.status(200).json({filelist : rows})
-											}
-											
-											
-										 })
-								 }
+								var userFileObject = [[email , filename , starred , is_directory , directoryToUpload , datetime , is_deleted]];
+								
+								connection.query('insert into user_files (email,file_name,starred,is_directory, directory , file_add_date , is_deleted) VALUES ?',[userFileObject] ,
+										function(err , result ){
+									if(err) throw err ; 
+									else{
+										if (fs.existsSync(path)) {
+											  var query = 'select file_name ,directory,starred from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
+												 
+											  connection.query(query ,[email, directoryToUpload] ,  function(err , rows , fields){
+													if(err ) throw err ;
+													else{
+														
+														var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+														
+														fetchDataQuery(connection , query11 ,[email] , function(result4){
+															res.status(200).json({filelist : rows , recent_files : result4})
+														} )
+														 
+														
+													}
+													
+													
+												 })
+										 }
+									}
+								})
 							}
 						})
-					}
-				})
-				
-			}else{
-				fs.mkdirSync(path, 0744); 
-				if (fs.existsSync(path)) {
-					file.mv(path +'/'+filename , function(err){
-						if(err) throw err 
-						else{
-							var userFileObject = [[email , filename , starred , is_directory , directoryToUpload]];
-							
-							connection.query('insert into user_files (email,file_name,starred, is_directory, directory) VALUES ?',[userFileObject] ,
-									function(err , result ){
-								if(err) throw err ;
+						
+					}else{
+						fs.mkdirSync(path, 0744); 
+						if (fs.existsSync(path)) {
+							file.mv(path +'/'+filename , function(err){
+								if(err) throw err 
 								else{
-									if (fs.existsSync(path)) {
-										  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ?' ;
-											 
-										  connection.query(query ,[email, directoryToUpload] ,  function(err , rows , fields){
-												if(err ) throw err ;
-												else{
-													console.log("Starred elements " , rows); 
-													res.status(200).json({filelist : rows})
-												}
-											})
-									 }
+									var userFileObject = [[email , filename , starred , is_directory , directoryToUpload , datetime , is_deleted]];
+									
+									connection.query('insert into user_files (email,file_name,starred, is_directory, directory , file_add_date , is_deleted) VALUES ?',[userFileObject] ,
+											function(err , result ){
+										if(err) throw err ;
+										else{
+											if (fs.existsSync(path)) {
+												  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
+													 
+												  connection.query(query ,[email, directoryToUpload] ,  function(err , rows , fields){
+														if(err ) throw err ;
+														else{
+															var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+															
+															fetchDataQuery(connection , query11 ,[email] , function(result4){
+																res.status(200).json({filelist : rows , recent_files : result4})
+															} )
+														}
+													})
+											 }
+										}
+									})
 								}
 							})
 						}
-					})
+					}
+				}else{
+					console.log('File already present') ; 
+					res.status(400).json({}) ; 
 				}
-			}
+			})
+			
+			
+			
+			
 		}
 	});
 	
@@ -819,8 +915,8 @@ module.exports = function(app){
 						}
 				    	
 				    	//delete record from mysql database
-						  connection.query('delete from user_files where email = ? and file_name = ? and directory = ? ', 
-								[ email , filename , directory] ,   function (error, results, fields) {
+						  connection.query('update user_files set is_deleted= ? where email = ? and file_name = ? and directory = ? ', 
+								[ true , email , filename , directory] ,   function (error, results, fields) {
 						    if (error) throw error;
 						    else{
 						    	
@@ -842,20 +938,28 @@ module.exports = function(app){
 											 		
 										    	  if (fs.existsSync(pathOfUser)) {
 										 			
-										    		  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ?' ;
+										    		  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
 														 
 													  connection.query(query ,[email, directory] ,  function(err , rows , fields){
 															if(err ) throw err ;
 															else{
 
 																var allData = rows ; 
-																var queryForUser = 'select file_name,directory,starred from user_files where starred=\'1\' and email = ? and directory = ? ' ; 
+																var queryForUser = 'select file_name,directory,starred from user_files where starred=\'1\' and is_deleted = \'0\' and email = ? and directory = ? ' ; 
 											 					
 											 					 console.log(queryForUser) ; 
 											 					 connection.query(queryForUser ,[email, directory] ,  function(err , rows , fields){
 											 						if(err ) throw err ;
 											 						else{
-											 							res.status(200).json({starred_data : rows , filelist : allData})
+											 							
+											 							 var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+																			
+																			fetchDataQuery(connection , query11 ,[email] , function(result4){
+																				res.status(200).json({starred_data : rows , filelist : allData , recent_files : result4})
+																			} )
+											 							
+											 							
+											 							
 											 						}
 											 					})
 															}
