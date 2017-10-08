@@ -26,6 +26,7 @@
 
   body{
     font-family: 'Ubuntu', sans-serif;
+    overflow-x:hidden;
   }
    
    .foo {
@@ -34,17 +35,10 @@
    </style>
   
 
-  <script type="text/javascript">
-    $(function () {
-        $(".identifyingClass").click(function () {
-            var my_id_value = $(this).data('id');
-            $(".modal-body #hiddenValue").val(my_id_value);
-        })
-    });
-</script>
+
 
   </head>
-  <body>
+  <body >
     <div id="root"></div>
    
 </html>

@@ -21,11 +21,13 @@ import profile from './components/LoggedIn/profile'
 import SubmitProfile from './components/LoggedIn/submitProfile'
 import Landing2 from './components/BeforeLoggedIn/Menu'
 import FileHistory from './components/LoggedIn/FileHistory'
+import EditProfile from './components/LoggedIn/EditProfile'
 
 const Main = () => (
   
     <Switch>
           <Route path="/profile_details" component={AuthenticateRouth(Home(SubmitProfile))}/>
+          <Route path="/edit_details" component={AuthenticateRouth(Home(EditProfile))}/>
           <Route exact path='/login' component={Landing2(Login)}/>
         	<Route exact path='/' component={Landing2(Registration)}/>
           <Route exact path='/home' component={AuthenticateRouth(Home(HomeComponent))}/>

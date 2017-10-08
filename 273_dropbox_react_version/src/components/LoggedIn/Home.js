@@ -9,7 +9,7 @@ import {setDirectory} from '../../actions/setDirectoryAction'
 import {setHomeHeading , getAllUsers} from '../../actions/setHomeAction'
 import { Link } from 'react-router-dom'
 import {createGroup , getAllGroups , getAllSharedGroupComponents , getMembersOfGroup} from '../../actions/GroupAction'
-
+import {checkProfileExist} from '../../actions/submitProfileAction'
 
 export default function(InnerComp ){
 
@@ -69,7 +69,7 @@ class Home extends Component{
 
    	  console.log('Directory Group to be set ' ,  this.state.directoryForGroups);
    	  
-
+   	  this.props.checkProfileExist(this.props.email) ; 
    	  this.props.setHomeHeading(heading) ;
       this.props.getAllFiles(this.props.email,'',this.state.directory) ; 
       this.props.getAllStarredFiles(this.props.email , this.state.directory);
@@ -78,7 +78,8 @@ class Home extends Component{
       this.props.getAllUsers(this.props.email) ;
       this.props.getAllGroups(this.props.email) ; 
       this.props.getAllSharedGroupComponents(this.props.email , this.state.directoryForGroups);
-      this.props.getMembersOfGroup(this.props.email , this.state.directoryForGroups)
+      this.props.getMembersOfGroup(this.props.email , this.state.directoryForGroups);
+
    }
 
 
@@ -201,7 +202,17 @@ class Home extends Component{
 					  			<Link  to="/groups" ><p style={fontSize}>Groups</p></Link>
 						     </div>
 						     <div style={styleDivForleftpanel}>
-					  			<Link  to="/profile_details" ><p style={fontSize}>Profile</p></Link>
+					  			
+					  				{
+					  					this.props.profileExist === true ? 	
+					  					<Link  to="/edit_details" ><p style={fontSize}>Profile</p></Link> 
+					  					: 
+					  					<Link  to="/profile_details" ><p style={fontSize}>Profile</p></Link> 	
+					  				}
+					  				
+					  				 
+					  			
+					  			
 						     </div> <div style={styleDivForleftpanel}>
 					  			<Link  to="/file_activity" ><p style={fontSize}>Activity Report</p></Link>
 						     </div>
@@ -361,7 +372,8 @@ function mapDispatchToProps(dispatch) {
         getAllGroups : (email) => dispatch(getAllGroups(email)),
         getAllSharedGroupComponents : (email , directory ) => dispatch(getAllSharedGroupComponents(email,directory)),
         getMembersOfGroup : (email , groupname) => dispatch(getMembersOfGroup(email , groupname)),
-        getRecentFiles : (email ) => dispatch(getRecentFiles(email)) 
+        getRecentFiles : (email ) => dispatch(getRecentFiles(email)) ,
+        checkProfileExist : (email) => dispatch(checkProfileExist(email))
     };
 }
 
@@ -376,6 +388,7 @@ function mapStateToProps(state) {
         Heading : state.HomeReducer.Heading,
         AllUsers : state.HomeReducer.getAllUsers,
         groupmembers : state.fileUploadReducer.groupmembers,
+        profileExist : state.profileReducer.profileExist
     };
 }
 

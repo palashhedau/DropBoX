@@ -3,12 +3,12 @@ import {viewFile} from '../../actions/viewFileAction'
 import {starItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
-import {submitProfile} from '../../actions/submitProfileAction'
+import {submitProfile , updateProfile} from '../../actions/submitProfileAction'
 import FileComponent from './FileComponent'
 import FileStarredComponents from './FileStarredComponents'
 import {checkProfileExist} from '../../actions/submitProfileAction'
 
-class SubmitProfile extends Component{
+class EditProfile extends Component{
 
 	constructor(props){
 		super(props) ;
@@ -18,16 +18,21 @@ class SubmitProfile extends Component{
 			education : '' ,
 			profession : '',
 			lifeevents : '' , 
-      profile : [] 
+      profile : {}
 		}
 	}
 	
-  
+  componentWillMount(){
+    this.props.checkProfileExist(this.props.email) ; 
+    this.setState({
+      profile : this.props.profile_details
+    })
+  }
 
 
 	render(){
 		
-		
+		console.log('Profile from server ' , this.state.profile)
 		const style10 = {
 			height: "10%"
 		}
@@ -76,7 +81,7 @@ class SubmitProfile extends Component{
                   		<div className="col-md-12">
                   		<div className="form-group">
                             <label>About : </label>
-                            <textarea  onChange={(e) => {
+                            <textarea value={this.props.profile_details.about} onChange={(e) => {
                             	this.setState({
                             		
                             			about : e.target.value
@@ -92,7 +97,7 @@ class SubmitProfile extends Component{
                   		<div className="col-md-12">
                   		<div className="form-group">
                             <label>Education : </label>
-                           <select onChange={(e) => {
+                           <select value={this.props.profile_details.education} onChange={(e) => {
                             	this.setState({
                             	
                             			education : e.target.value
@@ -115,7 +120,7 @@ class SubmitProfile extends Component{
                   		<div className="col-md-12">
                   		<div className="form-group">
                             <label>Profession : </label>
-                            <select onChange={(e) => {
+                            <select value={this.props.profile_details.profession} onChange={(e) => {
                             	this.setState({
                             		
                             			profession : e.target.value
@@ -138,7 +143,7 @@ class SubmitProfile extends Component{
                   		<div className="col-md-12">
                   		<div className="form-group">
                             <label>Life Events : </label>
-                          <textarea  onChange={(e) => {
+                          <textarea value={this.props.profile_details.lifeevents} onChange={(e) => {
                             	this.setState({
                             		
                             			lifeevents : e.target.value
@@ -156,13 +161,13 @@ class SubmitProfile extends Component{
                     <div className="row">
                     <div className="col-md-12">
                        
-
+                     
                           <button onClick={() => {
-                            this.props.submitProfile(this.props.email , this.state.about , this.state.education , 
-                            this.state.profession , this.state.lifeevents ) ;
+                            this.props.updateProfile(this.state.email , this.state.profile.about , this.state.profile.education , 
+                            this.state.profile.profession , this.state.profile.lifeevents ) ;
                             this.props.history.push('/home')
-                          }} className="btn main-btn pull-right">Submit</button>
-
+                          }} className="btn main-btn pull-right">Update</button>
+                      
                        
 
 
@@ -185,7 +190,8 @@ function mapDispatchToProps(dispatch){
 		starItems : (item) => dispatch(starItems(item)),
 		deleteFile : (email , filename ) => dispatch(deleteFile(email , filename )),
 		submitProfile : (email , about , education , profession, lifeevents) => dispatch(submitProfile(email , about , education , profession, lifeevents)),
-    checkProfileExist : (email) => dispatch(checkProfileExist(email))
+    checkProfileExist : (email) => dispatch(checkProfileExist(email)),
+    updateProfile : (email , about , education , profession, lifeevents) => dispatch(updateProfile(email , about , education , profession, lifeevents)),
 	}
 }
 
@@ -206,4 +212,4 @@ function mapStateToProps(state) {
 
 
 
-export default connect(mapStateToProps , mapDispatchToProps)(SubmitProfile) ;
+export default connect(mapStateToProps , mapDispatchToProps)(EditProfile) ;

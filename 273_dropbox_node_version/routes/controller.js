@@ -580,6 +580,35 @@ module.exports = function(app){
 	 })
 	 
 	 
+	 app.post('/checkProfileExist',  function(req, res) {
+		 var email = req.body.email ;
+		
+		 var query1 = 'select * from palash.user_profile where email = ?  ' ;
+		 var params1 = [ email ]  ;
+		 
+		 CheckIfExistQuery(connection ,query1 , params1 , function(result){
+			 if(!result){
+				 res.status(500).json({user : [] , profileExist : result})
+			 }else{
+				 fetchDataQuery(connection , query1 , params1 , function(result1){
+					 console.log('Result ' , result )
+					 if(result == null){
+						 res.status(500).json({user : [] , profileExist : result})
+					 }else{
+						 res.status(200).json({user : result1[0] , profileExist : result})
+					 }
+				 }) 
+			 }
+		 } )
+		 
+		 
+		 
+		
+	 })
+	 
+	 
+	 
+	 
 	 app.post('/createFolder',  function(req, res) {
 		 var email = req.body.email ; 
 		 var foldername = req.body.foldername ; 

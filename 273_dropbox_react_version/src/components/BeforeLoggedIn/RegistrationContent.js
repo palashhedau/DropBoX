@@ -95,7 +95,7 @@ class RegistrationContent extends Component{
 				 <form onSubmit={this.handleSubmit} encType="multipart/form-data">
 					<div>
 					
-						<div  className="row  col-sm-12 col-lg-12 col-md-12 foo " style={paddingTop}>
+						<div  className="row  col-sm-12 col-lg-12 col-md-12 " style={paddingTop}>
 					
 							
 							<div className="row padd">
