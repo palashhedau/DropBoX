@@ -22,6 +22,42 @@ export function createGroup(email , groupname)  {
 }
 
 
+
+export function setCurrentGroupFolder(fromEmail , directory , filename ){
+	return ({
+		type : 'SET_CURRENT_GROUP_FOLDER' , 
+		payload : {fromEmail , directory , filename}
+	})
+}
+
+
+
+
+
+export function openFolderAndViewContent(email , folderowner ,  foldername)  {
+	
+	return  function(dispatch){
+		axios.post('http://localhost:3002/readFolderForGroups' , {
+			email : email,
+			folderowner : folderowner,
+			foldername : foldername
+		})
+	    .then(function (response) {
+	  	console.log( "Group Content " , response.data.subGroupContent)
+	  	dispatch({type : 'SET_CURRENT_GROUP_FOLDER_CONTENT_SUCCESS' , payload :    response.data.subGroupContent })
+	  	
+	  })
+	  .catch(function (error) {
+	   dispatch({type : 'SET_CURRENT_GROUP_FOLDER_CONTENT_ERROR' , payload : error})
+	  })
+	}
+	
+}
+
+
+
+
+
 export function deleteGroup(email , groupname)  {
 	
 	return  function(dispatch){

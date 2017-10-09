@@ -141,6 +141,37 @@ module.exports = function(app){
 	})
 	
 	
+	app.post('/readFolderForGroups',  function(req, res) {
+		 var email = req.body.email ; 
+		 var path = 'public/Images/'+email;
+		 
+		 var folderowner = req.body.folderowner ; 
+		 var foldername = req.body.foldername ; 
+		 var directory = req.body.directory ; 
+		 
+		 
+		 
+		 console.log('Email , ,,,,, ' , email , foldername , folderowner , directory );
+		 query1 = 'select * from palash.user_files  where  email = ?  and reverse( ? ) = SUBSTRING(REVERSE(directory),1,(SELECT length( ? ))) and is_deleted = \'0\' '  ,
+		 params1 = [folderowner , foldername , foldername
+		            ]
+		 
+		 fetchDataQuery(connection , query1 , params1 , function(result){
+			 if(result === null){
+				 res.status(500).json({})
+			 }else{
+				 console.log('Group content ' , result )
+				 
+				 res.status(200).json({subGroupContent : result})
+			 }
+		 })
+		 
+		 
+	})
+	
+	
+	
+	
 	app.post('/readRecentfiles',  function(req, res) {
 		 var email = req.body.email ; 
 		

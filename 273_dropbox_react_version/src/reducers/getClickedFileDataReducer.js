@@ -1,7 +1,8 @@
 const initialState = {
 	fileData : null,
 	error : null ,
-	someData : false 
+	someData : false ,
+	sharedBy : '' 
 }
 
 
@@ -12,6 +13,9 @@ export default function reducer (state=initialState , action )  {
 		}
 		case 'SET_FILE_CONTENT_FAILURE' : {
 			return {...state , error : action.payload}
+		}
+		case 'SET_SHARED_USER_FILES' : {
+			return {...state , sharedBy : action.payload}
 		}
 		default :
 			return state ; 

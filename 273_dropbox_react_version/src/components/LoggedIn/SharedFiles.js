@@ -4,7 +4,7 @@ import {starItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
 import FileComponent from './FileComponent'
-import {getAllSharedComponents} from '../../actions/shareFileAction'
+import {getAllSharedComponents , setCurrentShared} from '../../actions/shareFileAction'
 import SharedFileComponent from './SharedFileComponent'
 
 class SharedComponent extends Component{
@@ -30,18 +30,18 @@ class SharedComponent extends Component{
 					</div>
 
 					
-					<table className="table ">
+					<table className="table table-hover table-condensed">
 
-						<thead>
+						<thead className="thead-inverse">
 					      <tr>
-					        <th>File Name</th>
-					        <th>Shared By</th>
+					        <th >File Name</th>
+					        <th >Shared By</th>
 					      </tr>
 					    </thead>
 					    <tbody>
 
 						{ this.props.listOfSharedFiles.map((file,key) => {
-							return <SharedFileComponent key={key} file={file}></SharedFileComponent>
+							return <SharedFileComponent {...this.props} key={key} file={file}></SharedFileComponent>
 						})}
 						</tbody>
 					</table>
@@ -58,7 +58,8 @@ function mapDispatchToProps(dispatch){
 		viewFile : (filename) => dispatch(viewFile(filename)),
 		starItems : (item) => dispatch(starItems(item)),
 		deleteFile : (email , filename ) => dispatch(deleteFile(email , filename )),
-		getAllSharedComponents : (email) => dispatch(getAllSharedComponents(email))
+		getAllSharedComponents : (email) => dispatch(getAllSharedComponents(email)),
+		setCurrentShared : (email) => dispatch(setCurrentShared(email))
 	}
 }
 

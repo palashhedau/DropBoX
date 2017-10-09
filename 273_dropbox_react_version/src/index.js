@@ -22,6 +22,8 @@ import SubmitProfile from './components/LoggedIn/submitProfile'
 import Landing2 from './components/BeforeLoggedIn/Menu'
 import FileHistory from './components/LoggedIn/FileHistory'
 import EditProfile from './components/LoggedIn/EditProfile'
+import SharedSubFolderComponents from './components/LoggedIn/SharedSubFolderComponents'
+import SharedSubFolderIndividualComponents from './components/LoggedIn/SharedSubFolderIndividualComponents'
 
 const Main = () => (
   
@@ -38,6 +40,8 @@ const Main = () => (
           <Route path="/profile/:membername" exact component={AuthenticateRouth(Home(profile))}/>
           <Route path="/groups/:groupname" component={AuthenticateRouth(Home(GroupsContent))}/>
           <Route path="/file_activity" component={AuthenticateRouth(Home(FileHistory))}/>
+          <Route path="/sharedFolderInGroup/:foldername" component={AuthenticateRouth(Home(SharedSubFolderComponents))}/>
+          <Route path="/sharedFolderInIndividual/:foldername" component={AuthenticateRouth(Home(SharedSubFolderIndividualComponents))}/>
     </Switch>
   
 )

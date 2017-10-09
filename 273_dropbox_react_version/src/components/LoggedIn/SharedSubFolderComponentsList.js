@@ -3,6 +3,7 @@ import {viewFile} from '../../actions/viewFileAction'
 import { unStarItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import { Link } from 'react-router-dom'
+import {deleteGroup , addMembersToTheGroup , getMembersOfGroup , setCurrentGroupFolder ,  openFolderAndViewContent ,  deleteMembersOfGroup} from '../../actions/GroupAction'
 
 
 class FileComponent extends Component{
@@ -11,7 +12,7 @@ class FileComponent extends Component{
 
 	render(){
 		
-		
+		console.log('SUb components ' , this.props.file) ; 
 		
 		return (
 			
@@ -22,7 +23,9 @@ class FileComponent extends Component{
 			 		this.props.file.file_name.indexOf('.') === -1 ? 
 			 			
 			 			<a  onClick={() => {
-				 			this.props.viewFile(this.props.file.file_name)
+				 			this.props.setCurrentGroupFolder(
+								 				this.props.file.email  ) ;
+							this.props.history.push('/sharedFolderInGroup/'+    this.props.file.directory + '/'+ this.props.file.file_name) 
 				 			}}> 
 						{ this.props.file.file_name.indexOf('jpg') !== -1 ? 
 								(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
@@ -49,28 +52,6 @@ class FileComponent extends Component{
 			 	}
 
 
-			 	
-			 
-
-			 	
-					
-			 		<span className="pull-right">
-			 				<ul className="nav navbar-nav">
-			 				<li className="dropdown">
-			 					<img className="dropdown-toggle" data-toggle="dropdown" 
-			 							 src={require("../../fonts/expand.JPG")}  height="25" width="50"  />
-			 					
-			 					<ul className="dropdown-menu">
-						          <li className="list-group-item">Share</li>
-						        </ul>
-			 				</li>
-			 			</ul>
-					</span>
-
-			 		<span className="pull-right"><img onClick={() => {
-			 			var file =  this.props.file.file_name ;
-			 			this.props.unStarItems(this.props.email , file , this.props.directoryForServer);
-			 		}} src={require("../../fonts/rStar.JPG")} height="18" width="54" /></span>
 			 </li>
 
 
@@ -83,7 +64,8 @@ class FileComponent extends Component{
 function mapDispatchToProps(dispatch){
 	return {
 		viewFile : (filename) => dispatch(viewFile(filename)),
-		unStarItems : (item1 , item2 , directory ) => dispatch(unStarItems(item1 , item2 , directory))
+		unStarItems : (item1 , item2 , directory ) => dispatch(unStarItems(item1 , item2 , directory)),
+		setCurrentGroupFolder : (email , directory , filename ) => dispatch(setCurrentGroupFolder(email , directory , filename))
 	}
 }
 

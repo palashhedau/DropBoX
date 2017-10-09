@@ -8,8 +8,9 @@ import {createFolder} from '../../actions/CreateFolderAction'
 import {setDirectory} from '../../actions/setDirectoryAction'
 import {setHomeHeading , getAllUsers} from '../../actions/setHomeAction'
 import { Link } from 'react-router-dom'
-import {createGroup , getAllGroups , getAllSharedGroupComponents , getMembersOfGroup} from '../../actions/GroupAction'
+import {createGroup , getAllGroups , getAllSharedGroupComponents , openFolderAndViewContent ,  getMembersOfGroup} from '../../actions/GroupAction'
 import {checkProfileExist} from '../../actions/submitProfileAction'
+import {openFolderAndViewContentIndividual} from '../../actions/shareFileAction'
 
 export default function(InnerComp ){
 
@@ -38,6 +39,16 @@ class Home extends Component{
 
 			directoryForGroups : this.props.location.pathname.replace('/groups/' , '') ,
 
+			directoryForGroupSubFolder : this.props.location.pathname.indexOf('/sharedFolderInGroup/root/') === 0 ? 
+											this.props.location.pathname.replace('/sharedFolderInGroup/root/' , '') 
+												:
+											this.props.location.pathname.replace('/sharedFolderInGroup/' , '') ,
+
+			directoryForIndividualSubFolder : this.props.location.pathname.indexOf('/sharedFolderInIndividual/root/') === 0 ? 
+											this.props.location.pathname.replace('/sharedFolderInIndividual/root/' , '') 
+												:
+											this.props.location.pathname.replace('/sharedFolderInIndividual/' , '')
+
 		}
 	}
 
@@ -46,6 +57,8 @@ class Home extends Component{
    }
 	
    componentWillMount() {
+   		
+
    	  var heading = '';	 
    	  console.log('Current Fiolder ' , this.state.directory)
    	  if(this.state.directoryForHeading === 'root')
@@ -60,14 +73,20 @@ class Home extends Component{
    	  	heading = 'Group Files'
    	  else if(this.state.directoryForHeading.indexOf( '/profile/') === 0  )
    	  	heading = 'Profile : ' + this.props.location.pathname.replace('/profile/' , '')
-   	  else if(this.state.directoryForHeading.indexOf( '/profile_details') === 0  )
+   	  else if(this.state.directoryForHeading.indexOf( '/profile_details') === 0 ||  this.state.directoryForHeading.indexOf( '/edit_details') === 0  )
    	  	heading = 'Enter your Details' 
    	  else if(this.state.directoryForHeading.indexOf( '/file_activity') === 0  )
    	  	heading = 'File Activities' 
+   	   else if(this.state.directoryForHeading.indexOf( '/sharedFolderInGroup') === 0  )
+   	  	heading = 'Group Contents' 
+   	  else if(this.state.directoryForHeading.indexOf( '/sharedFolderInIndividual') === 0  )
+   	  	heading = 'Shared Contents' 
    	  else
    	  	heading = 'Sub-directories'
 
-   	  console.log('Directory Group to be set ' ,  this.state.directoryForGroups);
+   	  
+
+
    	  
    	  this.props.checkProfileExist(this.props.email) ; 
    	  this.props.setHomeHeading(heading) ;
@@ -79,6 +98,26 @@ class Home extends Component{
       this.props.getAllGroups(this.props.email) ; 
       this.props.getAllSharedGroupComponents(this.props.email , this.state.directoryForGroups);
       this.props.getMembersOfGroup(this.props.email , this.state.directoryForGroups);
+      
+       if(this.props.sharedFolderInsideDetails.fromEmail){
+      		this.props.openFolderAndViewContent(this.props.email ,this.props.sharedFolderInsideDetails.fromEmail ,  
+      										this.state.directoryForGroupSubFolder )
+	 
+       }
+      
+       if(this.props.sharedByIndividual !== ''){
+     	this.props.openFolderAndViewContentIndividual(this.props.email , this.props.sharedByIndividual , this.state.directoryForIndividualSubFolder );
+   		}
+
+     	console.log("PARAM LOKKING FIOR " , this.props.location.pathname.indexOf('/sharedFolderInGroup') , ' KATA ' , this.props.sharedByIndividual )
+
+     	if(this.props.location.pathname.indexOf('/sharedFolderInGroup') ===0 && !this.props.sharedFolderInsideDetails.fromEmail){
+     		this.props.history.push('/groups')
+     	}
+
+     	if(this.props.location.pathname.indexOf('/sharedFolderInIndividual') ===0 && this.props.sharedByIndividual === ''){
+     		this.props.history.push('/shared')
+     	}
 
    }
 
@@ -373,7 +412,9 @@ function mapDispatchToProps(dispatch) {
         getAllSharedGroupComponents : (email , directory ) => dispatch(getAllSharedGroupComponents(email,directory)),
         getMembersOfGroup : (email , groupname) => dispatch(getMembersOfGroup(email , groupname)),
         getRecentFiles : (email ) => dispatch(getRecentFiles(email)) ,
-        checkProfileExist : (email) => dispatch(checkProfileExist(email))
+        checkProfileExist : (email) => dispatch(checkProfileExist(email)),
+        openFolderAndViewContent : (email , emailFrom  , foldername) => dispatch(openFolderAndViewContent(email , emailFrom  , foldername)),
+        openFolderAndViewContentIndividual : (email , emailFrom , foldername) => dispatch(openFolderAndViewContentIndividual(email , emailFrom , foldername))
     };
 }
 
@@ -388,7 +429,9 @@ function mapStateToProps(state) {
         Heading : state.HomeReducer.Heading,
         AllUsers : state.HomeReducer.getAllUsers,
         groupmembers : state.fileUploadReducer.groupmembers,
-        profileExist : state.profileReducer.profileExist
+        profileExist : state.profileReducer.profileExist,
+        sharedFolderInsideDetails : state.groupsReducer.sharedCurrentGroup ,
+        sharedByIndividual : state.getClickedFileDataReducer.sharedBy
     };
 }
 

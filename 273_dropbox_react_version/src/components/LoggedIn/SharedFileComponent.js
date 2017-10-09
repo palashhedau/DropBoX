@@ -4,7 +4,7 @@ import {viewFile} from '../../actions/viewFileAction'
 import {starItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
-import {shareFile} from '../../actions/shareFileAction'
+import {shareFile , setCurrentShared} from '../../actions/shareFileAction'
 
 class SharedFileComponent extends Component{
 
@@ -20,14 +20,17 @@ class SharedFileComponent extends Component{
 		return (
 			
 			 <tr>
-			 		<td>
+			 		<td><a onClick={() => {
+			 			this.props.setCurrentShared(this.props.file.from_user);
+			 			this.props.history.push('/sharedFolderInIndividual/'+    this.props.file.directory + '/'+ this.props.file.filename)
+			 		}}>
 			 			{ this.props.file.filename.indexOf('jpg') !== -1 ? 
 													(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
 													this.props.file.filename.indexOf('.') !== -1 ?   
 													 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
 													: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
 											}		
-			 			{this.props.file.filename}
+			 			{this.props.file.filename}</a>
 			 		</td>
 			 		<td>	
 			 			{this.props.file.from_user}
@@ -46,7 +49,8 @@ function mapDispatchToProps(dispatch){
 		viewFile : (filename) => dispatch(viewFile(filename)),
 		starItems : (email , item , directory ) => dispatch(starItems(email ,item , directory)),
 		deleteFile : (email , filename , directory  ) => dispatch(deleteFile(email , filename , directory )),
-		shareFile : (filename , directory , fromUser , toUser ) => dispatch(shareFile(filename , directory , fromUser , toUser ))
+		shareFile : (filename , directory , fromUser , toUser ) => dispatch(shareFile(filename , directory , fromUser , toUser )),
+		setCurrentShared : (email ) => dispatch(setCurrentShared(email))
 	}
 }
 

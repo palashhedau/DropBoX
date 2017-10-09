@@ -90,7 +90,19 @@ class FileComponent extends Component{
 			 			</ul>
 					</span>
 			 		
-			 			
+			 		
+					{ this.props.file.starred === '0' ? 
+
+						<span className="pull-right"><img onClick={() => {
+			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.directoryForServer);
+			 			}} src={require("../../fonts/bStar.JPG")} height="18" width="54" /></span>
+			 			:
+			 			<span className="pull-right"><img onClick={() => {
+			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.directoryForServer);
+			 			}} src={require("../../fonts/rStar.JPG")} height="18" width="54" /></span>
+					}
+
+
 					{
 				 		this.state.showButtonOrDropDownForGroup === 'ButtonForGroup' ? 
 				 		<button className="btn btn-default pull-right btn-xs" onClick={() => {
@@ -164,16 +176,7 @@ class FileComponent extends Component{
 				 	}
 
 			 		
-					{ this.props.file.starred === '0' ? 
-
-						<span className="pull-right"><img onClick={() => {
-			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.directoryForServer);
-			 			}} src={require("../../fonts/bStar.JPG")} height="18" width="36" /></span>
-			 			:
-			 			<span className="pull-right"><img onClick={() => {
-			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.directoryForServer);
-			 			}} src={require("../../fonts/rStar.JPG")} height="18" width="36" /></span>
-					}
+					
 
 			 		
 

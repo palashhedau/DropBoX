@@ -6,7 +6,8 @@ const initialState = {
 	listOfSharedFiles : [],
 	listOfGroupSharedFiles : [],
 	groupmembers : [] , 
-	listOfRecentFiles : []
+	listOfRecentFiles : [],
+	listOfIndividualSHaredContent : []
 }
 
 
@@ -66,6 +67,9 @@ export default function reducer (state=initialState , action )  {
 		}
 		case 'GET_RECENT_FILES_SUCCESS' : {
 			return {...state ,  listOfRecentFiles : action.payload.recent_items}
+		}
+		case 'SET_CURRENT_INDIVIDUAL_FOLDER_CONTENT_SUCCESS' : {
+			return {...state ,  listOfIndividualSHaredContent : action.payload.subGroupContent}
 		}
 		default :
 			return state ; 

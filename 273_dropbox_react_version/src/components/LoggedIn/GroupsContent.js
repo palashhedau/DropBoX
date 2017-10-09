@@ -5,11 +5,9 @@ import {starItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
 import {shareFile} from '../../actions/shareFileAction'
-import {deleteGroup , addMembersToTheGroup , getMembersOfGroup ,  deleteMembersOfGroup} from '../../actions/GroupAction'
+import {deleteGroup , addMembersToTheGroup , getMembersOfGroup , setCurrentGroupFolder ,  openFolderAndViewContent ,  deleteMembersOfGroup} from '../../actions/GroupAction'
 import FileComponent from './FileComponent'
 import FileStarredComponents from './FileStarredComponents'
-
-
 
 class GroupComponent extends Component{
 
@@ -115,7 +113,11 @@ class GroupComponent extends Component{
 													 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
 													: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
 											}	
-								 			<a>{file.filename}</a>
+								 			<a onClick={() => {
+								 				this.props.setCurrentGroupFolder(
+								 				file.file_owner , file.file_directory , file.filename ) ; 
+								 				this.props.history.push('/sharedFolderInGroup/'+    file.file_directory + '/'+ file.filename)
+								 			}} >{file.filename}</a>
 								 		</td>
 								 		<td>	
 								 			<a>{file.file_owner}</a>
@@ -141,7 +143,9 @@ function mapDispatchToProps(dispatch){
 		deleteGroup : (email , groupname) => dispatch(deleteGroup(email,groupname)),
 		addMembersToTheGroup : (email , emailtoadd , groupname) => dispatch(addMembersToTheGroup(email , emailtoadd , groupname)),
 		getMembersOfGroup : (email , groupname ) => dispatch(getMembersOfGroup(email, groupname)),
-		deleteMembersOfGroup : (email , membertodelete , groupname) => dispatch(deleteMembersOfGroup(email , membertodelete , groupname))
+		deleteMembersOfGroup : (email , membertodelete , groupname) => dispatch(deleteMembersOfGroup(email , membertodelete , groupname)),
+		openFolderAndViewContent : (email , emailFrom , directory , foldername) => dispatch(openFolderAndViewContent(email , emailFrom , directory , foldername)),
+		setCurrentGroupFolder : (email , directory , filename ) => dispatch(setCurrentGroupFolder(email , directory , filename))
 	}
 }
 

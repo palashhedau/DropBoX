@@ -78,3 +78,29 @@ export function shareFileInGroup(email , groupname , filename , directory )  {
 
 
 
+export function setCurrentShared(email ){
+	return {
+		type : 'SET_SHARED_USER_FILES' ,
+		payload : email
+	}
+}
+
+export function openFolderAndViewContentIndividual(email , folderowner ,  foldername)  {
+	
+	return  function(dispatch){
+		axios.post('http://localhost:3002/readFolderForGroups' , {
+			email : email,
+			folderowner : folderowner,
+			foldername : foldername
+		})
+	    .then(function (response) {
+	  	console.log( "Individual COntent ----------------------------------------------" , response.data)
+	  	dispatch({type : 'SET_CURRENT_INDIVIDUAL_FOLDER_CONTENT_SUCCESS' , payload :    response.data  })
+	  	
+	  })
+	  .catch(function (error) {
+	   dispatch({type :  'SET_CURRENT_INDIVIDUAL_FOLDER_CONTENT_ERROR' , payload : error})
+	  })
+	}
+	
+}
