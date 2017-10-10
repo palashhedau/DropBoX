@@ -29,6 +29,7 @@ class Home extends Component{
 							(	this.props.location.pathname.indexOf("/shared") === 0 ? 'root' :
 								this.props.location.pathname.indexOf("/profile") === 0 ? 'root' :
 								this.props.location.pathname.indexOf("/file_activity") === 0 ? 'root' :
+								this.props.location.pathname.indexOf("/edit_details") === 0 ? 'root' :
 								this.props.location.pathname.replace('/home/' , ''))))),
 			
 
@@ -99,17 +100,21 @@ class Home extends Component{
       this.props.getAllSharedGroupComponents(this.props.email , this.state.directoryForGroups);
       this.props.getMembersOfGroup(this.props.email , this.state.directoryForGroups);
       
-       if(this.props.sharedFolderInsideDetails.fromEmail){
+       if(this.props.sharedFolderInsideDetails.fromEmail !== undefined){
+      		console.log('CAusing issue i guess ' , this.props.sharedFolderInsideDetails.fromEmail);
       		this.props.openFolderAndViewContent(this.props.email ,this.props.sharedFolderInsideDetails.fromEmail ,  
       										this.state.directoryForGroupSubFolder )
 	 
        }
       
        if(this.props.sharedByIndividual !== ''){
-     	this.props.openFolderAndViewContentIndividual(this.props.email , this.props.sharedByIndividual , this.state.directoryForIndividualSubFolder );
+
+       	console.log('Very Importanrt  ' , this.state.directoryForIndividualSubFolder)
+     	this.props.openFolderAndViewContentIndividual(this.props.email , this.props.sharedByIndividual
+     			 , this.state.directoryForIndividualSubFolder );
    		}
 
-     	console.log("PARAM LOKKING FIOR " , this.props.location.pathname.indexOf('/sharedFolderInGroup') , ' KATA ' , this.props.sharedByIndividual )
+     	
 
      	if(this.props.location.pathname.indexOf('/sharedFolderInGroup') ===0 && !this.props.sharedFolderInsideDetails.fromEmail){
      		this.props.history.push('/groups')

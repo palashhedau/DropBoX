@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
-import {viewFile} from '../../actions/viewFileAction'
+import {viewFile , viewFileForGroup} from '../../actions/viewFileAction'
 import {starItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
@@ -109,18 +109,30 @@ class GroupComponent extends Component{
 								 		<td>
 								 			{ file.filename.indexOf('jpg') !== -1 ? 
 													(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
-													file.filename.indexOf('.') !== -1 ?   
+													file.is_directory === '0'  ?   
 													 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
 													: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
 											}	
-								 			<a onClick={() => {
-								 				this.props.setCurrentGroupFolder(
-								 				file.file_owner , file.file_directory , file.filename ) ; 
-								 				this.props.history.push('/sharedFolderInGroup/'+    file.file_directory + '/'+ file.filename)
-								 			}} >{file.filename}</a>
+								 			
+											{
+												file.is_directory === '1' ?
+												<a onClick={() => {
+									 				this.props.setCurrentGroupFolder(
+									 				file.file_owner , file.file_directory , file.filename ) ; 
+									 				this.props.history.push('/sharedFolderInGroup/'+    file.file_directory + '/'+ file.filename)
+									 			}} >{file.filename}</a> 
+									 			: 
+									 			<a onClick={() => {
+								 				viewFileForGroup(this.props.email ,  file.file_owner , file.filename 
+						 										, file.file_directory)
+										 			}} >{file.filename}</a>
+											}
+
+
+								 			
 								 		</td>
 								 		<td>	
-								 			<a>{file.file_owner}</a>
+								 			<a >{file.file_owner}</a>
 								 		</td>
 								 </tr>
 						})}

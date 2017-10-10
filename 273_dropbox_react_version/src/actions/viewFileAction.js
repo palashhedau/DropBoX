@@ -1,22 +1,53 @@
 import axios from 'axios' ; 
+import FileSaver  from 'file-saver' ; 
 
 var some = true ; 
 
-export function viewFile(file)  {
+export function viewFile(email , file , directory )  {
 	
-	return  function(dispatch){
-		axios.post('http://localhost:3002/viewFile' , {
-			file : file
-		})
-	    .then(function (response) {
-	  	console.log( response.body)
-	  	dispatch({type : 'SET_FILE_CONTENT_SUCCESS' , payload :  null })
+	axios.get('http://localhost:3002/downloadFile',{responseType: 'blob',  params: {
+		      email: email,
+		      file : file ,
+		      directory : directory
+		    }
+	  })
+	  .then(function (response) {
 	  	
+	    console.log(response)
+		FileSaver.saveAs(response.data, file);
+	    	
+
 	  })
 	  .catch(function (error) {
-	   dispatch({type : 'SET_FILE_CONTENT_FAILURE' , payload : error})
+	   		
 	  })
-	}
+	
 	
 }
 
+
+
+
+
+export function viewFileForGroup(email , fileowner , file , directory )  {
+	
+	axios.get('http://localhost:3002/downloadFile',{responseType: 'blob',  params: {
+		      email: email,
+		      file : file ,
+		      directory : directory,
+		      fileowner : fileowner
+		    }
+	  })
+	  .then(function (response) {
+	  	
+	    console.log(response)
+		FileSaver.saveAs(response.data, file);
+	    	
+
+	  })
+	  .catch(function (error) {
+	   		
+	  })
+	
+	
+}

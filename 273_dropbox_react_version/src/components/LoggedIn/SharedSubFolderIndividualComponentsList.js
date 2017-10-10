@@ -4,7 +4,7 @@ import { unStarItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import { Link } from 'react-router-dom'
 import {deleteGroup , addMembersToTheGroup , getMembersOfGroup , setCurrentGroupFolder ,  openFolderAndViewContent ,  deleteMembersOfGroup} from '../../actions/GroupAction'
-
+import {setCurrentShared} from '../../actions/shareFileAction'
 
 class FileComponent extends Component{
 
@@ -23,16 +23,13 @@ class FileComponent extends Component{
 			 		this.props.file.is_directory === '1' ? 
 			 			
 			 			<a  onClick={() => {
-				 			this.props.setCurrentGroupFolder(
+				 			this.props.setCurrentShared(
 								 				this.props.file.email  ) ;
-							this.props.history.push('/sharedFolderInGroup/'+    this.props.file.directory + '/'+ this.props.file.file_name) 
+							this.props.history.push('/sharedFolderInIndividual/'+    this.props.file.directory + '/'+ this.props.file.file_name) 
 				 			}}> 
-						{ this.props.file.file_name.indexOf('jpg') !== -1 ? 
-								(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
-								this.props.file.file_name.indexOf('.') !== -1 ?   
-								 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
-								: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
-							}
+						
+								 <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+							
 						
 						{this.props.file.file_name}
 						</a> 
@@ -66,7 +63,7 @@ function mapDispatchToProps(dispatch){
 	return {
 		viewFile : (filename) => dispatch(viewFile(filename)),
 		unStarItems : (item1 , item2 , directory ) => dispatch(unStarItems(item1 , item2 , directory)),
-		setCurrentGroupFolder : (email , directory , filename ) => dispatch(setCurrentGroupFolder(email , directory , filename))
+		setCurrentShared : (email ) => dispatch(setCurrentShared(email))
 	}
 }
 

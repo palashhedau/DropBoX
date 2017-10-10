@@ -7,9 +7,8 @@ var fs = require('fs-extra');
 var path = require('path')
 var readChunk = require('read-chunk');
 var fileType = require('file-type');
-var mime = require('mime-types')
 var path = require('path');
-
+var mime = require('mime');
 
 module.exports = function(app){
 	
@@ -151,10 +150,9 @@ module.exports = function(app){
 		 
 		 
 		 
-		 console.log('Email , ,,,,, ' , email , foldername , folderowner , directory );
+		 console.log('Causing Issue i guess ' ,directory , folderowner , foldername );
 		 query1 = 'select * from palash.user_files  where  email = ?  and reverse( ? ) = SUBSTRING(REVERSE(directory),1,(SELECT length( ? ))) and is_deleted = \'0\' '  ,
-		 params1 = [folderowner , foldername , foldername
-		            ]
+		 params1 = [folderowner , foldername , foldername]
 		 
 		 fetchDataQuery(connection , query1 , params1 , function(result){
 			 if(result === null){
@@ -168,6 +166,38 @@ module.exports = function(app){
 		 
 		 
 	})
+	
+	
+	
+	app.post('/readFolderForIndividuals',  function(req, res) {
+		 var email = req.body.email ; 
+		 var path = 'public/Images/'+email;
+		 
+		 var folderowner = req.body.folderowner ; 
+		 var foldername = req.body.foldername ; 
+		 var directory = req.body.directory ; 
+		 
+		 
+		 
+		 console.log('Australiaaaaaaaaaaaaaaaaaai , ,,,,, ' ,directory , folderowner , foldername );
+		 console.log('foldername length ' , foldername.length)
+		 query1 = 'select * from palash.user_files  where  email = ?  and reverse( trim ( ? )  ) = SUBSTRING(REVERSE(trim(directory)),1,(SELECT length( trim( ? )  ))) and is_deleted = \'0\' '  ,
+		 params1 = [folderowner , foldername , foldername]
+		 
+		 fetchDataQuery(connection , query1 , params1 , function(result){
+			 if(result === null){
+				 res.status(500).json({})
+			 }else{
+				 console.log('readFolderForIndividuals Result  ' , result )
+				 
+				 res.status(200).json({subGroupContent : result})
+			 }
+		 })
+		 
+		 
+	})
+	
+	
 	
 	
 	
@@ -243,8 +273,12 @@ module.exports = function(app){
 		 
 		 var query0 = "select starred from user_files WHERE email = ? and file_name= ? and directory = ? and is_deleted = \'0\' " ;
 		 params0 = [email, file_name , directory]
+		 
+		 console.log('Params for starring the file ' , params0);
 		 fetchDataQuery(connection, query0, params0, function(result) {
-		 	if(result === null){
+		 	console.log('Result after star ' , result ); 
+			 
+			 if(result === null){
 		 		
 		 	}else{
 		 		
@@ -577,7 +611,7 @@ module.exports = function(app){
 		 var email = req.body.email ;
 		console.log('Get files for ' , email );
 		
-		var query1 = 'select from_user , filename , directory from user_shared_files where to_user = ? ';
+		var query1 = 'select from_user , filename , t2.directory ,is_directory from palash.user_shared_files t2 , palash.user_files t1 where to_user = ?  and from_user = email  and file_name = filename  and is_deleted = \'0\'  ';
 		var params1 = [email] ;
 		
 		fetchDataQuery(connection , query1 , params1 , function(result){
@@ -596,7 +630,7 @@ module.exports = function(app){
 		 var email = req.body.email ;
 		 var groupname = req.body.groupname ; 
 		 
-		 var query1 = 'select filename , file_owner , t1.group_name , file_directory  from palash.user_groups_mapping t1 ,palash.group_files t2 where t1.group_name = ?   and t1.group_name = t2.group_name  and group_user = ?  ' ;
+		 var query1 = 'select filename , file_owner , t1.group_name , file_directory , is_directory from palash.user_groups_mapping t1 ,palash.group_files t2 , palash.user_files t3 where t1.group_name = ?   and t1.group_name = t2.group_name  and file_owner = t3.email and filename = t3.file_name and group_user = ? and is_deleted = \'0\'  ' ;
 		 var params = [  groupname , email ]  ;
 		 
 		 fetchDataQuery(connection , query1 , params , function(result){
@@ -636,6 +670,34 @@ module.exports = function(app){
 		 
 		
 	 })
+	 
+	 
+	 
+	 app.get('/downloadFile',  function(req, res) {
+		
+		 var email =  req.query.email;
+		 var file =  req.query.file;
+		 var directory =  req.query.directory;
+		 var fileowner =  req.query.fileowner;
+		 
+		 if(email === fileowner ){
+			 var path = 'public/Images/'+email;
+		 }else{
+			 var path = 'public/Images/'+fileowner;
+		 }
+		 
+		 if(directory === 'root'){
+			 path = path + '/' ; 
+		 }else{
+			 path = path + '/' + directory + '/' ; 
+		 }
+		 
+		 var file = path + file;
+		 
+		 res.download(file);
+		
+	 })
+	 
 	 
 	 
 	 
@@ -855,7 +917,7 @@ module.exports = function(app){
 			var filename  = file.name ; 
 			
 			
-			CheckIfExistQuery(connection, "select * from user_files where email = ?  and file_name = ? and directory = ? "
+			CheckIfExistQuery(connection, 'select * from user_files where email = ?  and file_name = ? and directory = ? and is_deleted = \'0\' '
 					, [email , filename ,  directoryToUpload ,  ], function(result) {
 				if(!result){
 					if (fs.existsSync(path)) {
@@ -980,59 +1042,67 @@ module.exports = function(app){
 						    if (error) throw error;
 						    else{
 						    	
-						    	var query1 = "delete from palash.user_shared_files where from_user = ?" ;
-						    	var params1 = [email]; 
-						    	DeleteQuery(connection , query1 , params1 , function(result){
+						    	var query100 = "update user_files set is_deleted= ? where email = ? and directory like " + connection.escape('%'+filename+'%');
+						    	var params100 = [ true , email  ] ;
+						    	
+						    	DeleteQuery(connection , query100 , params100 , function(result){
 						    		if(!result){
 						    			res.status(500).json({})
 						    		}else{
-						    			
-						    			var query2 = "delete from palash.group_files where filename= ? and file_directory = ? and file_owner = ? " ;
-								    	var params2 = [filename , directory , email]; 
-						    			
-								    	DeleteQuery(connection , query2 , params2 , function(result){
+						    			var query1 = "delete from palash.user_shared_files where from_user = ?" ;
+								    	var params1 = [email]; 
+								    	DeleteQuery(connection , query1 , params1 , function(result){
 								    		if(!result){
 								    			res.status(500).json({})
 								    		}else{
-								    			 var pathOfUser = path;
-											 		
-										    	  if (fs.existsSync(pathOfUser)) {
-										 			
-										    		  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
-														 
-													  connection.query(query ,[email, directory] ,  function(err , rows , fields){
-															if(err ) throw err ;
-															else{
+								    			
+								    			var query2 = "delete from palash.group_files where filename= ? and file_directory = ? and file_owner = ? " ;
+										    	var params2 = [filename , directory , email]; 
+								    			
+										    	DeleteQuery(connection , query2 , params2 , function(result){
+										    		if(!result){
+										    			res.status(500).json({})
+										    		}else{
+										    			 var pathOfUser = path;
+													 		
+												    	  if (fs.existsSync(pathOfUser)) {
+												 			
+												    		  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
+																 
+															  connection.query(query ,[email, directory] ,  function(err , rows , fields){
+																	if(err ) throw err ;
+																	else{
 
-																var allData = rows ; 
-																var queryForUser = 'select file_name,directory,starred from user_files where starred=\'1\' and is_deleted = \'0\' and email = ? and directory = ? ' ; 
-											 					
-											 					 console.log(queryForUser) ; 
-											 					 connection.query(queryForUser ,[email, directory] ,  function(err , rows , fields){
-											 						if(err ) throw err ;
-											 						else{
-											 							
-											 							 var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
-																			
-																			fetchDataQuery(connection , query11 ,[email] , function(result4){
-																				res.status(200).json({starred_data : rows , filelist : allData , recent_files : result4})
-																			} )
-											 							
-											 							
-											 							
-											 						}
-											 					})
-															}
-														})
+																		var allData = rows ; 
+																		var queryForUser = 'select file_name,directory,starred from user_files where starred=\'1\' and is_deleted = \'0\' and email = ? and directory = ? ' ; 
+													 					
+													 					 console.log(queryForUser) ; 
+													 					 connection.query(queryForUser ,[email, directory] ,  function(err , rows , fields){
+													 						if(err ) throw err ;
+													 						else{
+													 							
+													 							 var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+																					
+																					fetchDataQuery(connection , query11 ,[email] , function(result4){
+																						res.status(200).json({starred_data : rows , filelist : allData , recent_files : result4})
+																					} )
+													 							
+													 							
+													 							
+													 						}
+													 					})
+																	}
+																})
+												    		}
+												    
 										    		}
-										    
+										    	})
+								    			
+								    			
 								    		}
 								    	})
-						    			
-						    			
 						    		}
 						    	})
-						    	
 						    	
 						    	
 						    }

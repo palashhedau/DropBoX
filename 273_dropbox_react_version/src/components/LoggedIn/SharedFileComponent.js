@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
-import {viewFile} from '../../actions/viewFileAction'
+import {viewFile , viewFileForGroup} from '../../actions/viewFileAction'
 import {starItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
 import {shareFile , setCurrentShared} from '../../actions/shareFileAction'
+
 
 class SharedFileComponent extends Component{
 
@@ -20,17 +21,37 @@ class SharedFileComponent extends Component{
 		return (
 			
 			 <tr>
-			 		<td><a onClick={() => {
-			 			this.props.setCurrentShared(this.props.file.from_user);
-			 			this.props.history.push('/sharedFolderInIndividual/'+    this.props.file.directory + '/'+ this.props.file.filename)
-			 		}}>
-			 			{ this.props.file.filename.indexOf('jpg') !== -1 ? 
-													(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
-													this.props.file.filename.indexOf('.') !== -1 ?   
-													 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
-													: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
-											}		
-			 			{this.props.file.filename}</a>
+			 		<td>
+			 			
+			 			{
+			 				this.props.file.is_directory  === '1' ? 
+			 				<a onClick={() => {
+						 			this.props.setCurrentShared(this.props.file.from_user);
+						 			this.props.history.push('/sharedFolderInIndividual/'+    this.props.file.directory + '/'+ this.props.file.filename)
+						 		}}>
+					 			<img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+								{this.props.file.filename}
+				 			</a>
+
+				 			:
+
+				 			<a onClick={() => {
+						 			viewFileForGroup(this.props.email , this.props.file.from_user,
+						 			this.props.file.filename , this.props.file.directory )
+						 		}}>
+					 			{ this.props.file.filename.indexOf('.jpg') !== -1 ? 
+											<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>
+											: 
+											<img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
+															
+								}		
+					 			{this.props.file.filename}
+				 			</a>
+
+			 			}
+
+			 			
+
 			 		</td>
 			 		<td>	
 			 			{this.props.file.from_user}

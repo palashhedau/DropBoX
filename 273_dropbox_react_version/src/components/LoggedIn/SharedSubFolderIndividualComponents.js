@@ -4,7 +4,7 @@ import { unStarItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import { Link } from 'react-router-dom'
 import {deleteGroup , addMembersToTheGroup , getMembersOfGroup , setCurrentGroupFolder ,  openFolderAndViewContent ,  deleteMembersOfGroup} from '../../actions/GroupAction'
-import SharedSubFolderComponentsList from './SharedSubFolderComponentsList' ; 
+import SharedSubFolderIndividualComponentsList from './SharedSubFolderIndividualComponentsList' ; 
 
 class FileComponent extends Component{
 
@@ -43,7 +43,7 @@ class FileComponent extends Component{
 						      		
 						      		{
 						      			this.props.listOfIndividualSharedFIles.map((file,  key) => {
-						      				return <SharedSubFolderComponentsList {...this.props} key={key} file={file}></SharedSubFolderComponentsList>
+						      				return <SharedSubFolderIndividualComponentsList {...this.props} key={key} file={file}></SharedSubFolderIndividualComponentsList>
 						      			})
 						      		}
 

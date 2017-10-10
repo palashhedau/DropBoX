@@ -86,15 +86,15 @@ export function setCurrentShared(email ){
 }
 
 export function openFolderAndViewContentIndividual(email , folderowner ,  foldername)  {
-	
+	console.log( 'Individual Called ' , email , folderowner ,  foldername  )
 	return  function(dispatch){
-		axios.post('http://localhost:3002/readFolderForGroups' , {
+		axios.post('http://localhost:3002/readFolderForIndividuals' , {
 			email : email,
 			folderowner : folderowner,
 			foldername : foldername
 		})
 	    .then(function (response) {
-	  	console.log( "Individual COntent ----------------------------------------------" , response.data)
+	  	console.log( "Individual COntent IDNIDNDIDDNDNDNND ---------" , response.data)
 	  	dispatch({type : 'SET_CURRENT_INDIVIDUAL_FOLDER_CONTENT_SUCCESS' , payload :    response.data  })
 	  	
 	  })

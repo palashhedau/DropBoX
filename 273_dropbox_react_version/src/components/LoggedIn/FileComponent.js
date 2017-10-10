@@ -59,7 +59,7 @@ class FileComponent extends Component{
 
 			 		 : 
 				 		<a  onClick={() => {
-				 			this.props.viewFile(this.props.file.file_name)
+				 			viewFile(this.props.email ,this.props.file.file_name , this.props.file.directory )
 				 			}}> 
 						{ this.props.file.file_name.indexOf('jpg') !== -1 ? 
 								(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
@@ -81,10 +81,8 @@ class FileComponent extends Component{
 			 					<ul className="dropdown-menu">
 						          <li className="list-group-item"><a>Download</a></li>
 						          <li className="list-group-item" onClick={() => {
-						          	this.props.deleteFile(this.props.email , this.props.file.file_name , this.props.directoryForServer)
+						          	this.props.deleteFile(this.props.email , this.props.file.file_name , this.props.file.directory)
 						          }}><a>Delete</a></li>
-						          <li className="list-group-item"><a>Comment</a></li>
-						          <li className="list-group-item"><a>Version history</a></li>
 						        </ul>
 			 				</li>
 			 			</ul>
@@ -94,11 +92,11 @@ class FileComponent extends Component{
 					{ this.props.file.starred === '0' ? 
 
 						<span className="pull-right"><img onClick={() => {
-			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.directoryForServer);
+			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.file.directory);
 			 			}} src={require("../../fonts/bStar.JPG")} height="18" width="54" /></span>
 			 			:
 			 			<span className="pull-right"><img onClick={() => {
-			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.directoryForServer);
+			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.file.directory);
 			 			}} src={require("../../fonts/rStar.JPG")} height="18" width="54" /></span>
 					}
 
@@ -125,7 +123,7 @@ class FileComponent extends Component{
 									       			showButtonOrDropDownForGroup : 'ButtonForGroup'
 									       		})
 									       		this.props.shareFileInGroup(this.props.email , this.state.shareToGroup 
-									       			,this.props.file.file_name , this.props.directoryForServer  )
+									       			,this.props.file.file_name , this.props.file.directory  )
 									       		
 									       }}>Add</button>
 						<button className="btn btn-danger btn-sm" onClick={() => {
@@ -159,7 +157,7 @@ class FileComponent extends Component{
 									       		this.props.email === this.state.shareToEmail ? 
 									       		console.log('Cannot share with ourself') :
 									       		(
-									       			this.props.shareFile(this.props.file.file_name , this.props.directoryForServer,
+									       			this.props.shareFile(this.props.file.file_name , this.props.file.directory,
 									       			this.props.email , this.state.shareToEmail)
 									       		)
 									       		this.setState({
@@ -192,7 +190,7 @@ class FileComponent extends Component{
 
 function mapDispatchToProps(dispatch){
 	return {
-		viewFile : (filename) => dispatch(viewFile(filename)),
+		
 		starItems : (email , item , directory ) => dispatch(starItems(email ,item , directory)),
 		deleteFile : (email , filename , directory  ) => dispatch(deleteFile(email , filename , directory )),
 		shareFile : (filename , directory , fromUser , toUser ) => dispatch(shareFile(filename , directory , fromUser , toUser )),
