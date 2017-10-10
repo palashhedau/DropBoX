@@ -40,11 +40,11 @@ class SharedFileComponent extends Component{
 						 			this.props.file.filename , this.props.file.directory )
 						 		}}>
 					 			{ this.props.file.filename.indexOf('.jpg') !== -1 ? 
-											<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>
-											: 
-											<img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
-															
-								}		
+															(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
+															 ( this.props.file.filename.indexOf('.pdf') !== -1 ? 
+															  <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/> :
+															 <img src={require("../../fonts/doc.jpg")}  height="40" width="40"/> )
+								}	
 					 			{this.props.file.filename}
 				 			</a>
 

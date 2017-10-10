@@ -48,6 +48,7 @@ class MainFilesComponents extends Component{
 					      	  
 					      	   
 						      <div className="row" style={styleBottomBorder}>
+						      	<img src={require("../../fonts/GroupLogo.JPG")}  height="60" width="60"/>
 						      	<p>Yous Groups</p>
 						      </div>
 						      <div > 

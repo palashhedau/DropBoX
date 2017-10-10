@@ -34,9 +34,7 @@ class MainFilesComponents extends Component{
 			return <FileComponent key={key} file={file} > </FileComponent>
 		})
 
-		var listOfAStarredUserFiles = this.props.listOfSTarredFiles.map((file , key) => {
-			return <FileStarredComponents key={key} file={file} > </FileStarredComponents>
-		})
+		
 
 		return (
 				

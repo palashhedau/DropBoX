@@ -71,7 +71,7 @@ class Home extends Component{
    	  else if(this.state.directoryForHeading === '/groups')
    	  	heading = 'Groups'
    	  else if(this.state.directoryForHeading.indexOf( '/groups/') === 0  )
-   	  	heading = 'Group Files'
+   	  	heading = this.state.directoryForGroups
    	  else if(this.state.directoryForHeading.indexOf( '/profile/') === 0  )
    	  	heading = 'Profile : ' + this.props.location.pathname.replace('/profile/' , '')
    	  else if(this.state.directoryForHeading.indexOf( '/profile_details') === 0 ||  this.state.directoryForHeading.indexOf( '/edit_details') === 0  )

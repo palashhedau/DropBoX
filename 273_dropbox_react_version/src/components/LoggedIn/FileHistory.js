@@ -46,12 +46,16 @@ class FileHistory extends Component{
 						{ this.props.historyItems.map((file,key) => {
 							return <tr key={key}>
 								 		<td>
-								 			{ file.file_name.indexOf('jpg') !== -1 ? 
-																		(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
-																		file.file_name.indexOf('.') !== -1 ?   
-																		 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
-																		: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
-																}		
+								 			{ file.is_directory === '1' ? 
+												<img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>	:
+
+												(     file.file_name.indexOf('.jpg') !== -1 ? 
+														(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
+														 ( file.file_name.indexOf('.pdf') !== -1 ? 
+														  <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/> :
+														 <img src={require("../../fonts/doc.jpg")}  height="40" width="40"/> )
+												)					
+											}		
 								 			{file.file_name}
 								 		</td>
 								 		<td>	

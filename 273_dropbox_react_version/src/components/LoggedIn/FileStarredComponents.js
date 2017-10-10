@@ -7,7 +7,14 @@ import { Link } from 'react-router-dom'
 
 class FileComponent extends Component{
 
-	
+	constructor(props){
+		super(props);
+
+		this.state = {
+			url : '/home/' + (this.props.currentUrl === '' ? '' : this.props.currentUrl + '/' ) ,
+			
+		}
+	}
 
 	render(){
 		
@@ -19,29 +26,21 @@ class FileComponent extends Component{
 			 		
 			 	
 			 	{
-			 		this.props.file.file_name.indexOf('.') === -1 ? 
+			 		this.props.file.is_directory === '1' ? 
 			 			
-			 			<a  onClick={() => {
-				 			this.props.viewFile(this.props.file.file_name)
-				 			}}> 
-						{ this.props.file.file_name.indexOf('jpg') !== -1 ? 
-								(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
-								this.props.file.file_name.indexOf('.') !== -1 ?   
-								 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
-								: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
-							}
-						
-						{this.props.file.file_name}
-						</a> 
+			 			<Link   to={this.state.url  + this.props.file.file_name} > 
+							<img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+							{this.props.file.file_name}
+						</Link>
 			 		 : 
-				 		<a  onClick={() => {
-				 			this.props.viewFile(this.props.file.file_name)
+				 		<a onClick={() => {
+				 			viewFile(this.props.email , this.props.file.file_name , this.props.file.directory)
 				 			}}> 
-						{ this.props.file.file_name.indexOf('jpg') !== -1 ? 
-								(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
-								this.props.file.file_name.indexOf('.') !== -1 ?   
-								 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
-								: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+							{ this.props.file.file_name.indexOf('.jpg') !== -1 ? 
+									(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
+									 ( this.props.file.file_name.indexOf('.pdf') !== -1 ? 
+									  <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/> :
+									 <img src={require("../../fonts/doc.jpg")}  height="40" width="40"/> )
 							}
 						
 						{this.props.file.file_name}
@@ -82,7 +81,7 @@ class FileComponent extends Component{
 
 function mapDispatchToProps(dispatch){
 	return {
-		viewFile : (filename) => dispatch(viewFile(filename)),
+		
 		unStarItems : (item1 , item2 , directory ) => dispatch(unStarItems(item1 , item2 , directory))
 	}
 }
@@ -95,6 +94,7 @@ function mapStateToProps(state) {
         fileContent : state.getClickedFileDataReducer.fileData, 
         listOfSTarredFiles : state.fileUploadReducer.listOfStarredFiles,
         directoryForServer : state.CurrentDirectoryReducer.directoryForServer,
+        currentUrl : state.CurrentDirectoryReducer.directory,
     };
 }
 

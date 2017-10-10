@@ -53,6 +53,7 @@ class GroupComponent extends Component{
 					
 
 					 <div className="row" style={styleBottomBorder}>
+						      	<img src={require("../../fonts/groupMembers.jpg")}  height="60" width="100"/>
 						      	<p>Group Members</p>
 					</div>
 
@@ -107,12 +108,6 @@ class GroupComponent extends Component{
 						{ this.props.listOfGroupSharedFiles.map((file,key) => {
 							return  <tr key={key}>
 								 		<td>
-								 			{ file.filename.indexOf('jpg') !== -1 ? 
-													(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
-													file.is_directory === '0'  ?   
-													 <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/>
-													: <img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
-											}	
 								 			
 											{
 												file.is_directory === '1' ?
@@ -120,12 +115,22 @@ class GroupComponent extends Component{
 									 				this.props.setCurrentGroupFolder(
 									 				file.file_owner , file.file_directory , file.filename ) ; 
 									 				this.props.history.push('/sharedFolderInGroup/'+    file.file_directory + '/'+ file.filename)
-									 			}} >{file.filename}</a> 
+									 			}} >
+									 				<img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+									 				{file.filename}</a> 
 									 			: 
 									 			<a onClick={() => {
 								 				viewFileForGroup(this.props.email ,  file.file_owner , file.filename 
 						 										, file.file_directory)
-										 			}} >{file.filename}</a>
+										 			}} >
+										 			{ file.filename.indexOf('.jpg') !== -1 ? 
+															(<img src={require("../../fonts/image.jpg")}  height="40" width="40"/>) : 
+															 ( file.filename.indexOf('.pdf') !== -1 ? 
+															  <img src={require("../../fonts/pdf.jpg")}  height="40" width="40"/> :
+															 <img src={require("../../fonts/doc.jpg")}  height="40" width="40"/> )
+													}
+
+										 			{file.filename}</a>
 											}
 
 

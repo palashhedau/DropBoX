@@ -106,7 +106,7 @@ module.exports = function(app){
 	
 		app.post('/readallStarredfiles',  function(req, res) {
 			 var email = req.body.email ; 
-			 var query = 'select file_name , directory,starred from user_files where starred=\'1\' and email = ? and is_deleted = \'0\' ' ; 
+			 var query = 'select * from user_files where starred=\'1\' and email = ? and is_deleted = \'0\' ' ; 
 			 var directory = req.body.directory ; 
 			 var params = [email] ; 
 			 
@@ -123,7 +123,7 @@ module.exports = function(app){
 		 var directory = req.body.directory ; 
 		 console.log('Directory ' , directory )
 		 
-		 var query = 'select file_name, directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\' ' ;
+		 var query = 'select file_name, directory,starred,is_directory from user_files where email = ? and directory = ? and is_deleted = \'0\' ' ;
 		 
 		  
 		if(directory === 'root'){
@@ -177,10 +177,6 @@ module.exports = function(app){
 		 var foldername = req.body.foldername ; 
 		 var directory = req.body.directory ; 
 		 
-		 
-		 
-		 console.log('Australiaaaaaaaaaaaaaaaaaai , ,,,,, ' ,directory , folderowner , foldername );
-		 console.log('foldername length ' , foldername.length)
 		 query1 = 'select * from palash.user_files  where  email = ?  and reverse( trim ( ? )  ) = SUBSTRING(REVERSE(trim(directory)),1,(SELECT length( trim( ? )  ))) and is_deleted = \'0\' '  ,
 		 params1 = [folderowner , foldername , foldername]
 		 
@@ -188,8 +184,6 @@ module.exports = function(app){
 			 if(result === null){
 				 res.status(500).json({})
 			 }else{
-				 console.log('readFolderForIndividuals Result  ' , result )
-				 
 				 res.status(200).json({subGroupContent : result})
 			 }
 		 })
@@ -227,7 +221,7 @@ module.exports = function(app){
 		 
 		 UpdateQuery(connection ,updateQuery , params , function(result){
 			 if(result){
-				  var query1 = 'select file_name , directory,starred from user_files where starred=\'1\' and email = ? and is_deleted = \'0\' ';
+				  var query1 = 'select * from user_files where starred=\'1\' and email = ? and is_deleted = \'0\' ';
 				  var params1 = [email] ; 
 				  
 				  
@@ -292,7 +286,7 @@ module.exports = function(app){
 		 		 UpdateQuery(connection , query1 , params1 , function(result1){
 					 if(result1){
 						 
-						 var query2 = 'select file_name ,directory ,starred  from user_files where starred=\'1\' and email = ? and is_deleted = \'0\' ' ; 
+						 var query2 = 'select *  from user_files where starred=\'1\' and email = ? and is_deleted = \'0\' ' ; 
 						 var params2 = [email ] ; 
 						 
 						 fetchDataQuery(connection , query2 , params2 , function(result2){
@@ -394,7 +388,7 @@ module.exports = function(app){
 	
 	 app.post('/getFilesHistory',  function(req, res) {
 		 var email = req.body.email ;
-		 var query = 'select * from palash.user_files where is_deleted = \'1\'  and email = ? order by file_add_date  ' ;
+		 var query = 'select * from palash.user_files where is_deleted = \'1\'  and email = ? order by file_add_date  desc' ;
 		 var params = [email]  ; 
 		
 		 fetchDataQuery(connection , query , params , function(result){
@@ -680,11 +674,19 @@ module.exports = function(app){
 		 var directory =  req.query.directory;
 		 var fileowner =  req.query.fileowner;
 		 
+		 
 		 if(email === fileowner ){
 			 var path = 'public/Images/'+email;
-		 }else{
+		 }
+		 else if(email != fileowner && fileowner != undefined )
+		 {
 			 var path = 'public/Images/'+fileowner;
 		 }
+		 else{
+			 var path = 'public/Images/'+email;
+		 }
+		 
+		 
 		 
 		 if(directory === 'root'){
 			 path = path + '/' ; 
@@ -1074,7 +1076,7 @@ module.exports = function(app){
 																	else{
 
 																		var allData = rows ; 
-																		var queryForUser = 'select file_name,directory,starred from user_files where starred=\'1\' and is_deleted = \'0\' and email = ? and directory = ? ' ; 
+																		var queryForUser = 'select * from user_files where starred=\'1\' and is_deleted = \'0\' and email = ? and directory = ? ' ; 
 													 					
 													 					 console.log(queryForUser) ; 
 													 					 connection.query(queryForUser ,[email, directory] ,  function(err , rows , fields){
