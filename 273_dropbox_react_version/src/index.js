@@ -24,6 +24,8 @@ import FileHistory from './components/LoggedIn/FileHistory'
 import EditProfile from './components/LoggedIn/EditProfile'
 import SharedSubFolderComponents from './components/LoggedIn/SharedSubFolderComponents'
 import SharedSubFolderIndividualComponents from './components/LoggedIn/SharedSubFolderIndividualComponents'
+import BlankPage from './components/BeforeLoggedIn/Blank'
+
 
 const Main = () => (
   

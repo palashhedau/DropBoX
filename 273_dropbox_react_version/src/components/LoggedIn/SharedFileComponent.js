@@ -29,7 +29,7 @@ class SharedFileComponent extends Component{
 						 			this.props.setCurrentShared(this.props.file.from_user);
 						 			this.props.history.push('/sharedFolderInIndividual/'+    this.props.file.directory + '/'+ this.props.file.filename)
 						 		}}>
-					 			<img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+					 			<img src={require("../../fonts/folder.jpg")}  height="40" width="40"/>
 								{this.props.file.filename}
 				 			</a>
 

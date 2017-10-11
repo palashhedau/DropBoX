@@ -63,7 +63,7 @@ class GroupComponent extends Component{
 						
 						{
 							this.props.groupmembers.map((member , key) => {
-							return <li className="list-group-item padd" key={key}>
+							return <li style={styleBottomBorder} className="list-group-item padd" key={key}>
 							<Link to={this.state.url+ member.group_user}>{member.group_user}</Link> 
 							{	
 								this.props.email === member.group_owner ? 
@@ -116,7 +116,7 @@ class GroupComponent extends Component{
 									 				file.file_owner , file.file_directory , file.filename ) ; 
 									 				this.props.history.push('/sharedFolderInGroup/'+    file.file_directory + '/'+ file.filename)
 									 			}} >
-									 				<img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+									 				<img src={require("../../fonts/folder.jpg")}  height="40" width="40"/>
 									 				{file.filename}</a> 
 									 			: 
 									 			<a onClick={() => {

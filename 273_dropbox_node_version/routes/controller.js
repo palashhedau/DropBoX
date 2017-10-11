@@ -199,7 +199,7 @@ module.exports = function(app){
 	app.post('/readRecentfiles',  function(req, res) {
 		 var email = req.body.email ; 
 		
-		 var query = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+		 var query = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
 		
 		fetchDataQuery(connection , query ,[email] , function(result){
 			res.status(200).json({recent_items : result})
@@ -226,7 +226,7 @@ module.exports = function(app){
 				  
 				  
 				  fetchDataQuery(connection , query1 , params1 , function(result1){
-					  var query2 = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
+					  var query2 = 'select * from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
 					  var params2 = [email, directory] ; 
 					  
 					  fetchDataQuery(connection , query2 , params2 , function(result2){
@@ -235,7 +235,7 @@ module.exports = function(app){
 						  }else{
 							  
 								
-								 var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+								 var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
 								
 								fetchDataQuery(connection , query11 ,[email] , function(result3){
 									res.status(200).json({starred_data : result1 , filelist : result2 , recent_files : result3})
@@ -290,14 +290,14 @@ module.exports = function(app){
 						 var params2 = [email ] ; 
 						 
 						 fetchDataQuery(connection , query2 , params2 , function(result2){
-							 var query3 = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\' ' ;
+							 var query3 = 'select * from user_files where email = ? and directory = ? and is_deleted = \'0\' ' ;
 							 var params3 = [email, directory] ; 
 							 
 							 fetchDataQuery(connection , query3 , params3 , function(result3){
 								if(result === null){
 									
 								}else{
-									var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+									var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
 									
 									fetchDataQuery(connection , query11 ,[email] , function(result4){
 										res.status(200).json({starred_data : result2 , filelist : result3 , recent_files : result4})
@@ -746,7 +746,7 @@ module.exports = function(app){
 					 console.log('Error occured ');
 					 res.status(400).json({ success : false , error : ''})
 				 }else{
-					 var query2 = 'select file_name, directory,starred from user_files where email = ? and directory = ? and is_deleted=\'0\' ' ;
+					 var query2 = 'select * from user_files where email = ? and directory = ? and is_deleted=\'0\' ' ;
 					 var params2 = [email, directory] ; 
 				 
 					 fetchDataQuery(connection , query2 , params2 , function(result){
@@ -754,9 +754,10 @@ module.exports = function(app){
 							 res.status(400).json({ success : false , error : ''})
 						 }else{
 							 
-							 var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+							 var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date LIMIT 5' ;
 								
 								fetchDataQuery(connection , query11 ,[email] , function(result4){
+									console.log('Rsult 44444444 ' , result4)
 									res.status(200).json({filelist : result , recent_files : result4})
 								} )
 							 
@@ -933,13 +934,13 @@ module.exports = function(app){
 									if(err) throw err ; 
 									else{
 										if (fs.existsSync(path)) {
-											  var query = 'select file_name ,directory,starred from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
+											  var query = 'select * from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
 												 
 											  connection.query(query ,[email, directoryToUpload] ,  function(err , rows , fields){
 													if(err ) throw err ;
 													else{
 														
-														var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+														var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
 														
 														fetchDataQuery(connection , query11 ,[email] , function(result4){
 															res.status(200).json({filelist : rows , recent_files : result4})
@@ -969,12 +970,12 @@ module.exports = function(app){
 										if(err) throw err ;
 										else{
 											if (fs.existsSync(path)) {
-												  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
+												  var query = 'select * from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
 													 
 												  connection.query(query ,[email, directoryToUpload] ,  function(err , rows , fields){
 														if(err ) throw err ;
 														else{
-															var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+															var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
 															
 															fetchDataQuery(connection , query11 ,[email] , function(result4){
 																res.status(200).json({filelist : rows , recent_files : result4})
@@ -1069,7 +1070,7 @@ module.exports = function(app){
 													 		
 												    	  if (fs.existsSync(pathOfUser)) {
 												 			
-												    		  var query = 'select file_name,directory,starred from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
+												    		  var query = 'select * from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
 																 
 															  connection.query(query ,[email, directory] ,  function(err , rows , fields){
 																	if(err ) throw err ;
@@ -1083,7 +1084,7 @@ module.exports = function(app){
 													 						if(err ) throw err ;
 													 						else{
 													 							
-													 							 var query11 = 'select file_name, directory,starred from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date desc LIMIT 5' ;
+													 							 var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
 																					
 																					fetchDataQuery(connection , query11 ,[email] , function(result4){
 																						res.status(200).json({starred_data : rows , filelist : allData , recent_files : result4})

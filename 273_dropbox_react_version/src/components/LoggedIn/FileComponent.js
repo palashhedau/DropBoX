@@ -32,22 +32,24 @@ class FileComponent extends Component{
 		const style10 = {
 			height: "10%"
 		}
+
 		
 		
 		const styleBottomBorder = {
-			borderBottom: "1px solid#888",
+			border : "none",
+			borderBottom: "solid 2px #E6E8EB",
 			paddingTop:"15px"
 		}
 		console.log('Starred or not ' , this.props.file.starred) 
 		return (
 			
 
-			 <li style={styleBottomBorder}  className="list-group-item padd">
+			 <li   className="list-group-item padd" style={styleBottomBorder}>
 			 		
 			 	{
 			 		this.props.file.is_directory === '1' ? 
 			 			<Link   to={this.state.url  + this.props.file.file_name} > 
-							<img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+							<img src={require("../../fonts/folder.jpg")}  height="40" width="40"/>
 							{this.props.file.file_name}
 						</Link> 
 
@@ -91,7 +93,7 @@ class FileComponent extends Component{
 			 			:
 			 			<span className="pull-right"><img onClick={() => {
 			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.file.directory);
-			 			}} src={require("../../fonts/rStar.JPG")} height="18" width="54" /></span>
+			 			}} src={require("../../fonts/rStar.JPG")} height="20" width="54" /></span>
 					}
 
 

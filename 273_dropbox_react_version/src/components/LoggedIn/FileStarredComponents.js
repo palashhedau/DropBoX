@@ -18,18 +18,22 @@ class FileComponent extends Component{
 
 	render(){
 		
-		
+		const styleBottomBorder = {
+			border : "none",
+			borderBottom: "solid 2px #E6E8EB",
+			paddingTop:"15px"
+		}
 		
 		return (
 			
-			 <li   className="list-group-item padd">
+			 <li  style={styleBottomBorder} className="list-group-item padd">
 			 		
 			 	
 			 	{
 			 		this.props.file.is_directory === '1' ? 
 			 			
 			 			<Link   to={this.state.url  + this.props.file.file_name} > 
-							<img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+							<img src={require("../../fonts/folder.jpg")}  height="40" width="40"/>
 							{this.props.file.file_name}
 						</Link>
 			 		 : 
@@ -69,7 +73,7 @@ class FileComponent extends Component{
 			 		<span className="pull-right"><img onClick={() => {
 			 			var file =  this.props.file.file_name ;
 			 			this.props.unStarItems(this.props.email , file , this.props.directoryForServer);
-			 		}} src={require("../../fonts/rStar.JPG")} height="18" width="54" /></span>
+			 		}} src={require("../../fonts/rStar.JPG")} height="20" width="54" /></span>
 			 </li>
 
 

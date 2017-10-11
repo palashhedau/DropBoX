@@ -13,10 +13,15 @@ class FileComponent extends Component{
 	render(){
 		
 		console.log('SUb components ' , this.props.file) ; 
-		
+		const styleBottomBorder = {
+			border : "none",
+			borderBottom: "solid 2px #E6E8EB",
+			paddingTop:"15px"
+		}
+
 		return (
 			
-			 <li   className="list-group-item padd">
+			 <li style={styleBottomBorder}  className="list-group-item padd">
 			 		
 			 	
 			 	{
@@ -28,7 +33,7 @@ class FileComponent extends Component{
 							this.props.history.push('/sharedFolderInIndividual/'+    this.props.file.directory + '/'+ this.props.file.file_name) 
 				 			}}> 
 						
-							<img src={require("../../fonts/folder.jpg")}  height="40" width="50"/>
+							<img src={require("../../fonts/folder.jpg")}  height="40" width="40"/>
 							{this.props.file.file_name}
 						</a> 
 			 		 : 

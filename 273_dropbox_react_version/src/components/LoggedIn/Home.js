@@ -235,7 +235,9 @@ class Home extends Component{
 					  <div style={leftdivStyle}>
 					      
 					  	<div style={styleforLeftSmallDiv}>
-					  		<img style={styleSmallLogo} src={require("../../fonts/dropboxSmallLogo.JPG")}  height="35" width="40"/>
+					  		<img onClick={() =>{
+					  			this.props.history.push('/home');
+					  		}} style={styleSmallLogo} src={require("../../fonts/dropboxSmallLogo.JPG")}  height="40" width="50"/>
 					  		<div style={styleDivForleftpanel}>
 					  			<Link  to="/home" ><p style={fontSize}>Home</p></Link>
 						     </div>
@@ -269,7 +271,7 @@ class Home extends Component{
 						
 					  <div style={rightDivStyle} >
 					  	 <div className="row col-lg-12">
-					     		<div className="col-lg-9">
+					     		<div className="col-lg-9 col-sm-9 col-md-9 col-xs-9">
 					     			<h3 >{this.props.Heading}</h3>
 								</div>
 						      	
@@ -277,7 +279,7 @@ class Home extends Component{
 
 
 
-						      	<div className="col-lg-3">
+						      	<div className="col-lg-3 col-sm-3 col-md-3 col-xs-3">
 						      		
 						      		<div className="dropdown pull-right">
 									  <img className="dropdown-toggle" data-toggle="dropdown" 
@@ -299,11 +301,11 @@ class Home extends Component{
 
 					     <div className="row col-lg-12">
 					     		
-					     		<div className="col-lg-9 ">
+					     		<div className="col-lg-9 col-sm-12 col-md-9 col-xs-12 ">
 					     		<InnerComp {...this.props}> </InnerComp>
 					     		</div>
 					     		
-					     		<div className="col-lg-3 text-center">
+					     		<div className="col-lg-3 col-sm-12 col-md-3 col-xs-12 text-center">
 					     			<div className="row" >
 								      	<form onSubmit={this.handleSubmit} encType="multipart/form-data">
 								      		<label className="btn btn-primary btn-file btn-block">
