@@ -6,10 +6,13 @@ import {deleteFile} from '../../actions/uploadFileAction'
 import FileComponent from './FileComponent'
 import FileStarredComponents from './FileStarredComponents'
 
+
+
+
 class HomeComponent extends Component{
 
-	
-	
+
+		
 
 	render(){
 		
@@ -44,6 +47,8 @@ class HomeComponent extends Component{
 
 				<div className=" col-sm-12 col-lg-12 col-md-12 col-xs-12" >
 					      	  
+
+
 					      	   <div className="row" style={styleBottomBorder}>
 					      		<p>Starred</p>
 						      </div>
@@ -67,7 +72,9 @@ class HomeComponent extends Component{
 						      <div> 
 						      		
 						      </div>
-					      
+					      		
+
+
 						</div>
 							
 

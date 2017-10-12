@@ -14,7 +14,8 @@ module.exports = function(app){
 	
 	 app.use(upload()) ; 
 	 
-	 var connection = mysql.createConnection({
+	 var connection = mysql.createPool({
+		 connectionLimit : 500 ,  
 		 host : 'localhost',
 		 user : 'root',
 		 password : 'root',
@@ -804,17 +805,31 @@ module.exports = function(app){
 						 InserQuery(connection , query2 , params2 , function(result){
 							 if(!result){
 								 res.status(500).json({success : false})
-							 }else{
-								 connection.query('select * from group_files '  ,
-											function(err , rows , fields ){
-												if(err) {
-													console.log('Error 3 ') ;
+							 }else
+							 {
+								 	
+								 connection.getConnection(function(err , tempConnect){
+										if(err){
+											tempConnect.release();
+											console.log(err);
+											return fn(false);
+										}else{
+											tempConnect.query('select * from group_files '  ,  function(err , rows , fields){
+												tempConnect.release(); 
+												if(err ){
+													console.log('Error while fetching data ' , err);
 													res.status(500).json({})
-												
-												}else{
+												} 
+												else{
 													res.status(200).json({groupFileList : rows})
-												}})
-								 	}
+												}
+											})
+										}
+									})
+								 
+								 
+								 
+							 }
 						 })
 					}
 				 })
@@ -927,33 +942,36 @@ module.exports = function(app){
 						file.mv(path +'/'+filename , function(err){
 							if(err)throw err ;
 							else{
-								var userFileObject = [[email , filename , starred , is_directory , directoryToUpload , datetime , is_deleted]];
+								var query21 = 'insert into user_files (email,file_name,starred,is_directory, directory , file_add_date , is_deleted) VALUES ?';
+								var params21 = [[[email , filename , starred , is_directory , directoryToUpload , datetime , is_deleted]]] ;
 								
-								connection.query('insert into user_files (email,file_name,starred,is_directory, directory , file_add_date , is_deleted) VALUES ?',[userFileObject] ,
-										function(err , result ){
-									if(err) throw err ; 
-									else{
+								InserQuery(connection , query21 , params21 , function(result){
+									if(!result){
+										res.status(500).json({})
+									}else{
 										if (fs.existsSync(path)) {
-											  var query = 'select * from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
-												 
-											  connection.query(query ,[email, directoryToUpload] ,  function(err , rows , fields){
-													if(err ) throw err ;
-													else{
-														
-														var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
-														
-														fetchDataQuery(connection , query11 ,[email] , function(result4){
-															res.status(200).json({filelist : rows , recent_files : result4})
-														} )
-														 
-														
-													}
+											var query22  = 'select * from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
+											var params22 = [email, directoryToUpload];
+											
+											fetchDataQuery(connection , query22 , params22 , function(result){
+												if(result === null){
 													
+												}else{
+													var query23 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
 													
-												 })
-										 }
+													fetchDataQuery(connection , query23 ,[email] , function(result4){
+														res.status(200).json({filelist : result , recent_files : result4})
+													} )
+												}
+											})
+											
+											
+											
+										}
 									}
 								})
+								
+								
 							}
 						})
 						
@@ -963,26 +981,30 @@ module.exports = function(app){
 							file.mv(path +'/'+filename , function(err){
 								if(err) throw err 
 								else{
-									var userFileObject = [[email , filename , starred , is_directory , directoryToUpload , datetime , is_deleted]];
+									var userFileObject = [[[email , filename , starred , is_directory , directoryToUpload , datetime , is_deleted]]];
+									var query31 = 'insert into user_files (email,file_name,starred, is_directory, directory , file_add_date , is_deleted) VALUES ?' ;
 									
-									connection.query('insert into user_files (email,file_name,starred, is_directory, directory , file_add_date , is_deleted) VALUES ?',[userFileObject] ,
-											function(err , result ){
-										if(err) throw err ;
-										else{
+									inserQuery(connection , query31 , userFileObject , function(result){
+										if(!result){
+											res.status(500).json({})
+										}else{
 											if (fs.existsSync(path)) {
-												  var query = 'select * from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
-													 
-												  connection.query(query ,[email, directoryToUpload] ,  function(err , rows , fields){
-														if(err ) throw err ;
-														else{
-															var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
-															
-															fetchDataQuery(connection , query11 ,[email] , function(result4){
-																res.status(200).json({filelist : rows , recent_files : result4})
-															} )
-														}
-													})
-											 }
+												 var query32 = 'select * from user_files where email = ? and directory = ? and is_deleted= \'0\'' ;
+												var params32 = [email, directoryToUpload] ;
+												
+												fetchDataQuery(connection , query32 , params32 , function(rows){
+													if(rows === null){
+														
+													}else{
+														var query33 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
+														
+														fetchDataQuery(connection , query33 ,[email] , function(result4){
+															res.status(200).json({filelist : rows , recent_files : result4})
+														} )
+													}
+												})
+												
+											}
 										}
 									})
 								}
@@ -994,16 +1016,12 @@ module.exports = function(app){
 					res.status(400).json({}) ; 
 				}
 			})
-			
-			
-			
-			
 		}
 	});
 	
 	
 	
-	app.post('/delete',  function(req, res) {
+app.post('/delete',  function(req, res) {
 		var email = req.body.email ; 
 		var filename = req.body.filename ; 
 		var directory = req.body.directory ; 
@@ -1039,137 +1057,151 @@ module.exports = function(app){
 							});
 						}
 				    	
+				    	
+				    	query1 = 'update user_files set is_deleted= ? where email = ? and file_name = ? and directory = ? ';
+				    	params1 = [ true , email , filename , directory];
+				    	
+				    	
 				    	//delete record from mysql database
-						  connection.query('update user_files set is_deleted= ? where email = ? and file_name = ? and directory = ? ', 
-								[ true , email , filename , directory] ,   function (error, results, fields) {
-						    if (error) throw error;
-						    else{
-						    	
-						    	var query100 = "update user_files set is_deleted= ? where email = ? and directory like " + connection.escape('%'+filename+'%');
-						    	var params100 = [ true , email  ] ;
-						    	
-						    	DeleteQuery(connection , query100 , params100 , function(result){
-						    		if(!result){
-						    			res.status(500).json({})
-						    		}else{
-						    			var query1 = "delete from palash.user_shared_files where from_user = ?" ;
-								    	var params1 = [email]; 
-								    	DeleteQuery(connection , query1 , params1 , function(result){
-								    		if(!result){
-								    			res.status(500).json({})
-								    		}else{
-								    			
-								    			var query2 = "delete from palash.group_files where filename= ? and file_directory = ? and file_owner = ? " ;
-										    	var params2 = [filename , directory , email]; 
-								    			
-										    	DeleteQuery(connection , query2 , params2 , function(result){
-										    		if(!result){
-										    			res.status(500).json({})
-										    		}else{
-										    			 var pathOfUser = path;
-													 		
-												    	  if (fs.existsSync(pathOfUser)) {
-												 			
-												    		  var query = 'select * from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
-																 
-															  connection.query(query ,[email, directory] ,  function(err , rows , fields){
-																	if(err ) throw err ;
-																	else{
-
-																		var allData = rows ; 
-																		var queryForUser = 'select * from user_files where starred=\'1\' and is_deleted = \'0\' and email = ? and directory = ? ' ; 
-													 					
-													 					 console.log(queryForUser) ; 
-													 					 connection.query(queryForUser ,[email, directory] ,  function(err , rows , fields){
-													 						if(err ) throw err ;
-													 						else{
-													 							
-													 							 var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
+						  UpdateQuery(connection , query1 , params1 , function(result){
+							  if(!result){
+								  res.status(500).json({})
+							  }else{
+								  var query100 = "update user_files set is_deleted= ? where email = ? and directory like " + connection.escape('%'+filename+'%');
+							      var params100 = [ true , email  ] ;
+							      
+							      DeleteQuery(connection , query100 , params100 , function(result){
+							    	  if(!result){
+							    			res.status(500).json({})
+							    		}else{
+							    			var query1 = "delete from palash.user_shared_files where from_user = ?" ;
+									    	var params1 = [email]; 
+									    	DeleteQuery(connection , query1 , params1 , function(result){
+									    		if(!result){
+									    			res.status(500).json({})
+									    		}else{
+									    			var query2 = "delete from palash.group_files where filename= ? and file_directory = ? and file_owner = ? " ;
+											    	var params2 = [filename , directory , email]; 
+											    	
+											    	DeleteQuery(connection , query2 , params2 , function(result){
+											    		if(!result){
+											    			res.status(500).json({})
+											    		}else{
+											    			 var pathOfUser = path;
+														 		
+													    	  if (fs.existsSync(pathOfUser)){
+													    		  var query = 'select * from user_files where email = ? and directory = ? and is_deleted = \'0\'' ;
+													    		  var params = [email, directory] ;
+													    		  
+													    		  fetchDataQuery(connection , query , params , function(rows){
+													    			  if(rows === null ){
+													    				  res.status(500).json({})
+													    			  }else{
+													    				  var allData = rows ; 
+																		  var queryForUser = 'select * from user_files where starred=\'1\' and is_deleted = \'0\' and email = ? and directory = ? ' ;
+																		  var params = [email, directory] ;
+																		  
+																		  fetchDataQuery(connection , queryForUser , params , function(result){
+																			  if(result === null ){
+																				  res.status(500).json({})
+																			  }else{
+																				  var query11 = 'select * from palash.user_files where email = ?  and is_deleted = \'0\' order by file_add_date  LIMIT 5' ;
 																					
 																					fetchDataQuery(connection , query11 ,[email] , function(result4){
-																						res.status(200).json({starred_data : rows , filelist : allData , recent_files : result4})
+																						res.status(200).json({starred_data : result , filelist : allData , recent_files : result4})
 																					} )
 													 							
-													 							
-													 							
-													 						}
-													 					})
-																	}
-																})
-												    		}
-												    
-										    		}
-										    	})
-								    			
-								    			
-								    		}
-								    	})
-						    		}
-						    	})
-						    	
-						    	
-						    }
-						  });
+																			  }
+																		  })
+																	  }
+													    		  })
+													    	 }
+											    		}
+											    	})
+									    		}
+									    	})
+							    		}  
+							      })
+							  }
+						  })
 					}
 			 });
 		}else{
 			console.log('File not present ');
 		}
 	});
-	
-	
-	
-	
-	 
-	
-	 
-	 
-	 
-	
-	
 };
 
 
 function fetchDataQuery(connection , query , params , fn){
-	connection.query(query ,params ,  function(err , rows , fields){
-		if(err ){
-			console.log('Error while fetching data ' , err);
-			return fn(null) ; 
-		} 
-		else{
-			return fn(rows);
+	
+	
+	connection.getConnection(function(err , tempConnect){
+		if(err){
+			tempConnect.release();
+			console.log(err);
+			return fn(false);
+		}else{
+			tempConnect.query(query ,params ,  function(err , rows , fields){
+				tempConnect.release(); 
+				if(err ){
+					console.log('Error while fetching data ' , err);
+					return fn(null) ; 
+				} 
+				else{
+					return fn(rows);
+				}
+				
+				
+			 })
 		}
-		
-		
-	 })
+	})
 }
 
 
 
 function UpdateQuery(connection , query , params , fn){
-	 connection.query(query, params, function(err){
-            	 if(err){
-            		 console.log(err);
-            		 return fn(false)
-            	 }
-            	 else{
-            		 return fn(true)
-            	 }
-     })
+	 
+	connection.getConnection(function(err , tempConnect){
+		if(err){
+			tempConnect.release();
+			console.log(err);
+			return fn(false);
+		}else{
+			tempConnect.query(query, params, function(err){
+				tempConnect.release();
+	           	 if(err){
+	           		 console.log(err);
+	           		 return fn(false)
+	           	 }
+	           	 else{
+	           		 return fn(true)
+	           	 }
+			})
+		}
+	})
+
 }
 
 
 function InserQuery(connection , query , params , fn){
 	console.log('Query ' , params )
 	
-	connection.query(query,params ,
-			function(err  , result){
+	connection.getConnection(function(err , tempConnect){
 		if(err){
-			console.log(err);
+			tempConnect.release();
 			return fn(false);
-		}
-		else{
-			return fn(true) ; 
+		}else{
+			tempConnect.query(query,params ,function(err  , result){
+				tempConnect.release();
+				if(err){
+					console.log(err);
+					return fn(false);
+				}
+				else{
+					return fn(true) ; 
+				}
+			})
 		}
 	})
 }
@@ -1179,14 +1211,22 @@ function InserQuery(connection , query , params , fn){
 function DeleteQuery(connection , query , params , fn){
 	console.log('Query ' , params )
 	
-	connection.query(query,params ,
-			function(err  , result){
+	connection.getConnection(function(err , tempConnect){
 		if(err){
+			tempConnect.release();
 			console.log(err);
 			return fn(false);
-		}
-		else{
-			return fn(true) ; 
+		}else{
+			tempConnect.query(query,params ,function(err  , result){
+				tempConnect.release() ;
+				if(err){
+					console.log(err);
+					return fn(false);
+				}
+				else{
+					return fn(true) ; 
+				}
+			})
 		}
 	})
 }
@@ -1195,20 +1235,24 @@ function DeleteQuery(connection , query , params , fn){
 
 
 function CheckIfExistQuery(connection , query , params ,  fn ){
-	connection.query(query , params , function(err , rows , fields){
-		if(err ) throw err ;
-		
-		if(rows[0]){
-			
-			return fn(true) 
-			
-		    } else {
-		    	
-		        return fn(false) 
-		    }
-			
 	
-		
+	connection.getConnection(function(err , tempConnect){
+		if(err){
+			tempConnect.release();
+			console.log(err);
+			return fn(false);
+		}else{
+			tempConnect.query(query , params , function(err , rows , fields){
+				tempConnect.release() ; 
+				if(err ) throw err ;
+				
+				if(rows[0]){
+					return fn(true) 
+				} else {
+				    return fn(false) 
+				}
+			})
+		}
 	})
 }
 
@@ -1216,19 +1260,27 @@ function CheckIfExistQuery(connection , query , params ,  fn ){
 
 
 function CheckIfExistQueryWithoutParams(connection , query , fn ){
-	connection.query(query , function(err , rows , fields){
-		if(err ) throw err ;
-		
-		if(rows[0]){
-			console.log('User found ') ; 
-			return fn(true) 
-			
-		    } else {
-		    	console.log('User not found ') ; 
-		        return fn(false) 
-		    }
-			
 	
-		
+	
+	connection.getConnection(function(err , tempConnect){
+		if(err){
+			tempConnect.release();
+			console.log(err);
+			return fn(false);
+		}else{
+			tempConnect.query(query , function(err , rows , fields){
+				tempConnect.release();
+				if(err ) throw err ;
+				
+				if(rows[0]){
+					console.log('User found ') ; 
+					return fn(true) 
+					
+				    } else {
+				    	console.log('User not found ') ; 
+				        return fn(false) 
+				    }
+			})
+		}
 	})
 }

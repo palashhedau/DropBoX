@@ -52,7 +52,7 @@ export function updateProfile(email , about , education , profession , lifeevent
 
 export function getProfile(email  )  {
 	
-	
+	console.log('Getting profile ' , email )
 
 	return  function(dispatch){
 		 axios.post('http://localhost:3002/getProfile', {

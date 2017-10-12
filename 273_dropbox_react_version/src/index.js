@@ -24,7 +24,7 @@ import FileHistory from './components/LoggedIn/FileHistory'
 import EditProfile from './components/LoggedIn/EditProfile'
 import SharedSubFolderComponents from './components/LoggedIn/SharedSubFolderComponents'
 import SharedSubFolderIndividualComponents from './components/LoggedIn/SharedSubFolderIndividualComponents'
-import BlankPage from './components/BeforeLoggedIn/Blank'
+import Modal from './components/LoggedIn/Modal'
 
 
 const Main = () => (
@@ -39,7 +39,6 @@ const Main = () => (
           <Route path="/shared" component={AuthenticateRouth(Home(SharedComponent))}/>
           <Route path="/files" component={AuthenticateRouth(Home(MainFilesComponent))}/>
           <Route path="/groups" exact component={AuthenticateRouth(Home(Groups))}/>
-          <Route path="/profile/:membername" exact component={AuthenticateRouth(Home(profile))}/>
           <Route path="/groups/:groupname" component={AuthenticateRouth(Home(GroupsContent))}/>
           <Route path="/file_activity" component={AuthenticateRouth(Home(FileHistory))}/>
           <Route path="/sharedFolderInGroup/:foldername" component={AuthenticateRouth(Home(SharedSubFolderComponents))}/>

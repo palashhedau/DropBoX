@@ -8,6 +8,10 @@ import {shareFile} from '../../actions/shareFileAction'
 import {deleteGroup , addMembersToTheGroup , getMembersOfGroup , setCurrentGroupFolder ,  openFolderAndViewContent ,  deleteMembersOfGroup} from '../../actions/GroupAction'
 import FileComponent from './FileComponent'
 import FileStarredComponents from './FileStarredComponents'
+import Modal from 'react-modal'
+import {getProfile} from '../../actions/submitProfileAction'
+
+
 
 class GroupComponent extends Component{
 
@@ -15,7 +19,8 @@ class GroupComponent extends Component{
 		super(props);
 		this.state = {
 			directoryForGroups : this.props.location.pathname.replace('/groups/' , '') ,
-			url : '/profile/'
+			url : '/profile/',
+			modalIsOpen: false
 		}
 	}
 
@@ -23,12 +28,7 @@ class GroupComponent extends Component{
 		this.props.getMembersOfGroup(this.props.email , this.state.directoryForGroups)
 	}
 	
-	
-
-
-
-
-	
+		
 	render(){
 		const style10 = {
 			height: "10%"
@@ -44,9 +44,28 @@ class GroupComponent extends Component{
 			paddingTop:"15px"
 		}
 
-		
+		const customStyles = {
+	      content : {
+	        top                   : '40%',
+	        left                  : '50%',
+	        right                 : '50%',
+	        bottom                : 'auto',
+	        marginRight           : '-50%',
+	        transform             : 'translate(-50%, -50%)'
+	      }
+	    };
 
 		
+
+		const stylePadding = {
+			paddingTop : "30px"
+		}
+
+		
+
+		const FontSize = {
+			fontSize: "20px"
+		}
 
 		return (
 				 <div className=" col-sm-12 col-lg-12 col-md-12 col-xs-12">
@@ -59,12 +78,102 @@ class GroupComponent extends Component{
 
 					<div>
 
+
+					 <Modal
+                        isOpen={this.state.modalIsOpen}
+                        style= {customStyles}
+                        onRequestClose={this.closeModal}
+                        shouldCloseOnOverlayClick={false}
+                        contentLabel="Profile">
+
+                        
+						   
+
+	                         {  this.props.profileData.length > 0 ?
+
+							 	<div >   
+
+								    <div className="pull-right"> 
+								    		<h3>
+								    			{
+								    				this.props.profileData.map((data , key) => {
+								    					return data.email
+								    				})
+								    			}
+								    		</h3>
+								    </div>
+
+								    <div style={stylePadding}>
+								    {
+								    	this.props.profileData.map((data , key) => {
+								    		return <div key={key} style={styleBottomBorder}> 
+												      	<p style={FontSize}>About </p>	
+												      	{data.about}
+												    </div>
+								    	})
+								    }
+								   
+								    {
+								    	this.props.profileData.map((data , key) => {
+								    		return <div key={key} style={styleBottomBorder}> 
+												      	<p style={FontSize}>Education </p>	
+												      	{data.education}
+												    </div>
+								    	})
+								    }
+
+								     {
+								    	this.props.profileData.map((data , key) => {
+								    		return <div key={key} style={styleBottomBorder}> 
+												      	<p style={FontSize}>Profession </p>	
+												      	{data.profession}
+												    </div>
+								    	})
+								    }
+
+								     {
+								    	this.props.profileData.map((data , key) => {
+								    		return <div key={key} style={styleBottomBorder}> 
+												      	<p style={FontSize}>Life-Events </p>	
+												      	{data.lifeevents}
+												    </div>
+								    	})
+								    }
+								    </div>
+
+								 </div> 
+
+
+								    :
+								    <h3>No Profile submitted by the member</h3>
+
+								}
+							   
+                        
+                      		<div className="pull-right" style={stylePadding}>
+                      			<button onClick={() => {
+                      				this.setState({modalIsOpen: false});
+                      			}} className="btn btn-danger">Close</button>
+                      		</div>
+                        
+                      </Modal>
+
+
+
 					<ul className="list-group">
 						
 						{
 							this.props.groupmembers.map((member , key) => {
 							return <li style={styleBottomBorder} className="list-group-item padd" key={key}>
-							<Link to={this.state.url+ member.group_user}>{member.group_user}</Link> 
+							<a onClick={(e) => {
+								console.log('Member ' , member.group_user)
+								this.props.getProfile(member.group_user)
+								this.setState({
+									modalIsOpen: true
+								})
+
+
+							}}>{member.group_user}</a>
 							{	
 								this.props.email === member.group_owner ? 
 
@@ -162,7 +271,8 @@ function mapDispatchToProps(dispatch){
 		getMembersOfGroup : (email , groupname ) => dispatch(getMembersOfGroup(email, groupname)),
 		deleteMembersOfGroup : (email , membertodelete , groupname) => dispatch(deleteMembersOfGroup(email , membertodelete , groupname)),
 		openFolderAndViewContent : (email , emailFrom , directory , foldername) => dispatch(openFolderAndViewContent(email , emailFrom , directory , foldername)),
-		setCurrentGroupFolder : (email , directory , filename ) => dispatch(setCurrentGroupFolder(email , directory , filename))
+		setCurrentGroupFolder : (email , directory , filename ) => dispatch(setCurrentGroupFolder(email , directory , filename)),
+		getProfile : (email) => dispatch(getProfile(email))
 	}
 }
 
@@ -179,6 +289,7 @@ function mapStateToProps(state) {
         AllUsers : state.HomeReducer.getAllUsers,
         listOfGroupSharedFiles : state.fileUploadReducer.listOfGroupSharedFiles,
          groupmembers : state.fileUploadReducer.groupmembers,
+         profileData : state.profileReducer.profile
         
     };
 }
