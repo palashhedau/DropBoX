@@ -408,17 +408,18 @@ module.exports = function(app){
 		 var email = req.body.email ;
 		 var emailToAdd = req.body.emailtoadd 
 		 var groupname = req.body.groupname ;
+		 var group_id = req.body.group_id ; 
 		 console.log('Before query ') ; 
 		 
-		 query1 =  'select * from user_groups_mapping where group_name = ? and group_user = ?'; 
-		 params1 =  [groupname , emailToAdd];
+		 query1 =  'select * from user_groups_mapping where group_name = ? and group_user = ? and group_id = ? '; 
+		 params1 =  [groupname , emailToAdd , group_id ];
 		 
 		 CheckIfExistQuery(connection , query1 , params1 , function(result){
 			 if(result){
 				 res.status(500).json({})
 			 }else{
-				 var query2 = 'insert into user_groups_mapping (group_name, group_user) VALUES ?' ; 
-				 var params2 = [[[groupname , emailToAdd  ]]];
+				 var query2 = 'insert into user_groups_mapping (group_name, group_user , group_id ) VALUES ?' ; 
+				 var params2 = [[[groupname , emailToAdd , group_id  ]]];
 				 InserQuery(connection , query2 , params2 , function(result){
 					 if(result){
 						 res.status(200).json({success : true})
@@ -437,16 +438,17 @@ module.exports = function(app){
 	 app.post('/deleteGroup',  function(req, res) {
 		 var email = req.body.email ;
 		 var groupname = req.body.groupname ;
+		 var group_id = req.body.group_id ;
 		 
-		 var query1 = 'delete from  users_groups where  group_name = ?';
-		 var params1 = [groupname ];
+		 var query1 = 'delete from  users_groups where  group_id = ? ';
+		 var params1 = [ group_id ];
 		 
 		 DeleteQuery(connection, query1 , params1 , function(result){
 			 if(!result){
 				 res.status(500).json({}) 
 			 }else{
-				 var query3 = 'delete from  user_groups_mapping where  group_name = ?' ; 
-				 var params3 = [groupname ] ; 
+				 var query3 = 'delete from  user_groups_mapping where  group_id = ?' ; 
+				 var params3 = [group_id ] ; 
 				 
 				 DeleteQuery(connection, query3 , params3 , function(result){
 					 if(!result){
@@ -460,8 +462,8 @@ module.exports = function(app){
 								 res.status(500).json({}) 
 							 }else
 							 {
-								 query2 = 'select * from palash.user_groups_mapping t2 ,palash.users_groups t1 where group_user = ?  and t1.group_name = t2.group_name';
-								 params2 = [email] ; 
+								 query2 = 'select t2.group_name , group_owner , t2.group_id  , group_user from  palash.user_groups_mapping t2 ,palash.users_groups t1  where  t2.group_id = t1.group_id  and t2.group_user = t1.group_owner and group_owner = ?   UNION select t2.group_name , group_owner , t2.group_id  ,group_user from palash.users_groups t1 ,  palash.user_groups_mapping t2 where group_user = ? and t1.group_id = t2.group_id  ' ;
+								 params2 = [email , email ] ; 
 								 
 								 fetchDataQuery(connection, query2 , params2 , function(result){
 									 if(result == null ){
@@ -484,9 +486,10 @@ module.exports = function(app){
 		 var email = req.body.email ;
 		 var groupname = req.body.groupname ;
 		 var membertodelete = req.body.membertodelete ; 
+		 var group_id = req.body.group_id ; 
 		 
-		 var query1 = 'delete from user_groups_mapping   where  group_name =  ?  and group_user = ? ';
-		 var params1 = [groupname , membertodelete ];
+		 var query1 = 'delete from user_groups_mapping   where   group_user = ? and group_id = ? ';
+		 var params1 = [membertodelete , group_id ];
 		 
 		 DeleteQuery(connection, query1 , params1 , function(result){
 			 if(!result){
@@ -502,16 +505,16 @@ module.exports = function(app){
 						 res.status(500).json({}) 
 					 }else
 					 {
-						 var query3 = 'select distinct group_user , group_owner from palash.user_groups_mapping t2 , palash.users_groups t1 where t1.group_name = t2.group_name and t1.group_name =  ? ' ;
-						 var params3 = [groupname] ;
+						 var query3 = 'select distinct group_user , group_owner ,t1.group_id  from palash.user_groups_mapping t2 , palash.users_groups t1  where t1.group_id = t2.group_id  and t1.group_id = ? ' ;
+						 var params3 = [group_id] ;
 						 
 						 fetchDataQuery(connection, query3 , params3 , function(result1){
 							 if(result == null ){
 								 res.status(500).json({})
 							 }else{
 								 
-								 var query4 = 'select filename , file_owner , t1.group_name , file_directory  from palash.user_groups_mapping t1 ,palash.group_files t2 where t1.group_name = ?   and t1.group_name = t2.group_name  and group_user = ?  ' ;
-								 var params4 = [  groupname , email ]  ;
+								 var query4 = 'select  t2.filename , t2.file_owner , t2.group_name , t2.file_directory , is_directory  from  palash.users_groups t1 ,  palash.group_files t2 , palash.user_files t3 where group_id = ?  and t1.group_owner = t2.group_owner and t2.group_name = t1.group_name and t3.file_name = t2.filename and t3.directory = t2.file_directory and is_deleted = \'0\'     ' ;
+								 var params4 = [  group_id ]  ;
 								 
 								 fetchDataQuery(connection , query4 , params4 , function(result){
 									 console.log('Result ' , result )
@@ -570,8 +573,8 @@ module.exports = function(app){
 	app.post('/getAllGroups',  function(req, res) {
 		 var email = req.body.email ;
 		 
-		 query1 = 'select * from palash.user_groups_mapping t2 ,palash.users_groups t1 where group_user = ?  and t1.group_name = t2.group_name ' ;
-		 params1 = [email] ;
+		 query1 = 'select t2.group_name , group_owner , t2.group_id  , group_user from  palash.user_groups_mapping t2 ,palash.users_groups t1  where   t2.group_user = t1.group_owner  and  t2.group_id = t1.group_id  and group_owner = ?   UNION select t2.group_name , group_owner , t2.group_id  ,group_user from palash.users_groups t1 ,  palash.user_groups_mapping t2 where group_user = ? and t1.group_id = t2.group_id ' ;
+		 params1 = [email , email ] ;
 		 
 		 fetchDataQuery(connection , query1 , params1 , function(result){
 			 if(result == null ){
@@ -585,10 +588,10 @@ module.exports = function(app){
 	
 	 app.post('/getMembersOfGroup',  function(req, res) {
 		 var email = req.body.email ;
-		 var groupname = req.body.groupname ;
+		 var group_id = req.body.group_id ;
 		
-		 var query1 = 'select distinct group_user , group_owner from palash.user_groups_mapping t2 , palash.users_groups t1 where t1.group_name = t2.group_name and t1.group_name =  ? ' ;
-		 var params1 = [groupname] ;
+		 var query1 = 'select distinct group_user , group_owner ,t1.group_id  from palash.user_groups_mapping t2 , palash.users_groups t1  where t1.group_id = t2.group_id  and t1.group_id = ? ' ;
+		 var params1 = [group_id] ;
 		 
 		 fetchDataQuery(connection, query1 , params1 , function(result){
 			 if(result == null ){
@@ -623,10 +626,10 @@ module.exports = function(app){
 
 	 app.post('/getAllSharedGroupComponents',  function(req, res) {
 		 var email = req.body.email ;
-		 var groupname = req.body.groupname ; 
+		 var group_id = req.body.group_id ; 
 		 
-		 var query1 = 'select filename , file_owner , t1.group_name , file_directory , is_directory from palash.user_groups_mapping t1 ,palash.group_files t2 , palash.user_files t3 where t1.group_name = ?   and t1.group_name = t2.group_name  and file_owner = t3.email and filename = t3.file_name and group_user = ? and is_deleted = \'0\'  ' ;
-		 var params = [  groupname , email ]  ;
+		 var query1 = 'select  t2.filename , t2.file_owner , t2.group_name , t2.file_directory , is_directory  from  palash.users_groups t1 ,  palash.group_files t2 , palash.user_files t3 where group_id = ?  and t1.group_owner = t2.group_owner and t2.group_name = t1.group_name and t3.file_name = t2.filename and t3.directory = t2.file_directory and is_deleted = \'0\'     ' ;
+		 var params = [  group_id  ]  ;
 		 
 		 fetchDataQuery(connection , query1 , params , function(result){
 			 console.log('Result ' , result )
@@ -634,6 +637,31 @@ module.exports = function(app){
 				 res.status(500).json({})
 			 }else{
 				 res.status(200).json({filelist : result})
+			 }
+		 })
+		
+	 })
+	 
+	 
+	  app.post('/getGroupName',  function(req, res) {
+		 var email = req.body.email ;
+		 var group_id = req.body.group_id ; 
+		 
+		 var query1 = ' select * from palash.users_groups  where group_id =  ?  ' ;
+		 var params = [  group_id  ]  ;
+		 
+		 fetchDataQuery(connection , query1 , params , function(result){
+			 console.log('Result ' , result )
+			 if(result == null){
+				 res.status(500).json({})
+			 }else{
+				 if(result[0]){
+					 res.status(200).json({groupname  : result[0].group_name })
+				 }else{
+					 res.status(200).json({groupname  : '' })
+				 }
+				 
+				 
 			 }
 		 })
 		
@@ -648,14 +676,20 @@ module.exports = function(app){
 		 
 		 CheckIfExistQuery(connection ,query1 , params1 , function(result){
 			 if(!result){
-				 res.status(500).json({user : [] , profileExist : result})
+				 console.log('Profile fetch error ' , email)
+				 res.status(502).json({user : [] , profileExist : result})
 			 }else{
 				 fetchDataQuery(connection , query1 , params1 , function(result1){
 					 console.log('Result ' , result )
 					 if(result == null){
 						 res.status(500).json({user : [] , profileExist : result})
 					 }else{
-						 res.status(200).json({user : result1[0] , profileExist : result})
+						 if(result1[0]){
+							 res.status(200).json({user : result1[0] , profileExist : result})
+						 }else{
+							 res.status(500).json({})
+						 }
+						 
 					 }
 				 }) 
 			 }
@@ -780,18 +814,16 @@ module.exports = function(app){
 		 var groupname = req.body.groupname ;
 		 var filename = req.body.filename ;
 		 var directory = req.body.directory ;
+		 var groupowner = req.body.groupowner ; 
 		 
-		 var query0 = "select group_owner from palash.users_groups where group_name =  ? ";
-		 var params0 = [groupname] ; 
+		 console.log('HAHAHAHAHAHA   ' , groupname , groupname.length ,
+				 							groupowner , groupowner.length)	
 		 
-		 fetchDataQuery(connection , query0 , params0 , function(result){
-			 if(result === null){
-				 res.status(500).json({})
-			 }else{
-				 console.log('Group Owner ' , result[0].group_owner);
-				 var owner =  result[0].group_owner ; 
-				 var query1 = 'select * from group_files where group_name = ? and file_owner = ? and filename = ? and file_directory = ?' ;
-				 var params1 = [groupname , email , filename , directory ] ; 
+		 
+				
+				 
+				 var query1 = 'select * from group_files where group_name = ? and file_owner = ? and filename = ? and file_directory = ? and group_owner = ? ' ;
+				 var params1 = [groupname , email , filename , directory , groupowner ] ; 
 				 
 				 
 				 
@@ -799,7 +831,7 @@ module.exports = function(app){
 					 if(result){
 						 res.status(500).json({})
 					 }else{
-						 var params2 = [[[groupname , email , filename , directory , owner ]]];
+						 var params2 = [[[groupname , email , filename , directory , groupowner ]]];
 						 var query2 = 'insert into group_files (group_name, file_owner , filename , file_directory, group_owner) VALUES ?' ;
 						 
 						 InserQuery(connection , query2 , params2 , function(result){
@@ -814,7 +846,8 @@ module.exports = function(app){
 											console.log(err);
 											return fn(false);
 										}else{
-											tempConnect.query('select * from group_files '  ,  function(err , rows , fields){
+											tempConnect.query('select * from group_files where group_name = ? and group_owner = ? ' ,[groupname , groupowner] ,
+													function(err , rows , fields){
 												tempConnect.release(); 
 												if(err ){
 													console.log('Error while fetching data ' , err);
@@ -833,8 +866,8 @@ module.exports = function(app){
 						 })
 					}
 				 })
-			 }
-		 })
+			 
+		
 		 
 		 
 	})
@@ -850,8 +883,8 @@ module.exports = function(app){
 		 
 		 CheckIfExistQuery(connection , query1, params1 , function(result){
 			 if(result){
-				 var query2 = 'select * from user_groups_mapping where group_user = ? ' ;
-				 var params2 = [email] ;
+				 var query2 = 'select t2.group_name , group_owner , t2.group_id  , group_user from  palash.user_groups_mapping t2 ,palash.users_groups t1  where   t2.group_user = t1.group_owner  and  t2.group_id = t1.group_id  and group_owner = ?   UNION select t2.group_name , group_owner , t2.group_id  ,group_user from palash.users_groups t1 ,  palash.user_groups_mapping t2 where group_user = ? and t1.group_id = t2.group_id ' ;
+				 var params2 = [email , email] ;
 				 
 				 fetchDataQuery(connection , query2 , params2 , function(result){
 					 if(result==null){
@@ -870,30 +903,48 @@ module.exports = function(app){
 					 if(!result){
 						 res.status(500).json({})
 					 }else{
-						 var params4 = [ [[  groupname ,email ]]];
-						 var query4 = 'insert into user_groups_mapping (group_name, group_user) VALUES ?' ; 
 						 
-						 InserQuery(connection ,query4 , params4 , function(result){
-							 if(!result){
-								 res.status(500).json({})
+						 var query111 = 'select * from palash.users_groups where  group_owner = ? and  group_name= ? '
+						 var params111 = [ email ,groupname  ] ;
+						 
+						 fetchDataQuery(connection , query111 , params111 , function(result){
+							 if(result === null ){
+								 res.send(500).json({})
 							 }else{
-								 var params5 = [email];
-								 var query5 = 'select * from palash.user_groups_mapping t2 ,palash.users_groups t1 where group_user = ?  and t1.group_name = t2.group_name';
-								 				
-								 fetchDataQuery(connection , query5 , params5 , function(result){
-									 if(result == null ){
+								
+								 console.log('Result ' , result )
+								  var id = result[0].group_id ;
+								 var query4 = 'insert into user_groups_mapping (group_name, group_user, group_id) VALUES ?' ;
+								 var params44 = [[[groupname , email  , id ]]]
+								 InserQuery(connection ,query4 , params44 , function(result){
+									if(!result){
 										 res.status(500).json({})
-									 }else{
-										 res.status(200).json({grouplist : result})
-									 }
+									} else{
+										var query5 = 'select t2.group_name , group_owner , t2.group_id  , group_user from  palash.user_groups_mapping t2 ,palash.users_groups t1  where  t2.group_id = t1.group_id  and t2.group_user = t1.group_owner and group_owner = ?   UNION select t2.group_name , group_owner , t2.group_id  ,group_user from palash.users_groups t1 ,  palash.user_groups_mapping t2 where group_user = ? and t1.group_id = t2.group_id  '
+										var params5 = [email , email ];
+											
+										 fetchDataQuery(connection , query5 , params5 , function(result){
+											 if(result == null ){
+												 res.status(500).json({})
+											 }else{
+												 res.status(200).json({grouplist : result})
+											 }
+										 })	
+											
+											
+									}
 								 })
 								 
 							 }
-						 } )
+						 })
 						 
 						 
 					 }
 				 })
+				 
+				 
+				 
+				 
 				 
 			 }
 		 })

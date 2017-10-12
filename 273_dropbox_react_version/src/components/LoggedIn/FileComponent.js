@@ -5,12 +5,13 @@ import {starItems} from '../../actions/StarredAction'
 import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
 import {shareFile , shareFileInGroup} from '../../actions/shareFileAction'
+import NotificationSystem from 'react-notification-system'
 
 class FileComponent extends Component{
 
 	constructor(props){
 		super(props);
-
+		
 		this.state = {
 			url : '/home/' + (this.props.currentUrl === '' ? '' : this.props.currentUrl + '/' ) ,
 			shareToEmail : '',
@@ -21,11 +22,7 @@ class FileComponent extends Component{
 	}
 	
 
-	setUserToShare(e) {
-		console.log('Share to ' , e.target.value);
-		
-	}
-
+	
 
 	render(){
 
@@ -78,6 +75,7 @@ class FileComponent extends Component{
 						          <li className="list-group-item"><a>Download</a></li>
 						          <li className="list-group-item" onClick={() => {
 						          	this.props.deleteFile(this.props.email , this.props.file.file_name , this.props.file.directory)
+						          	console.log('Delete by notification')
 						          }}><a>Delete</a></li>
 						        </ul>
 			 				</li>
@@ -110,7 +108,7 @@ class FileComponent extends Component{
 
 												<option>---Select Group---</option> 	
 										 	{this.props.groupList.map((group , key) => {
-										  		return <option   key={key}>{group.group_name}</option>
+										  		return <option   key={key}>{group.group_name} - {group.group_owner}</option>
 										  	})} 
 
 						</select>

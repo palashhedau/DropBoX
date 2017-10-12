@@ -53,14 +53,17 @@ export function getAllSharedComponents(email )  {
 
 export function shareFileInGroup(email , groupname , filename , directory )  {
 	
-	console.log("Share with groups parameter " , email , groupname , filename , directory)
+	var group = groupname.substring(0,groupname.indexOf('- ')-1)
+	var owner = groupname.substring(groupname.indexOf('- ')+2 ,groupname.length )
+
 
 	return  function(dispatch){
 		 axios.post('http://localhost:3002/shareFileWithGroup', {
 	  	email : email,
-	  	groupname : groupname,
+	  	groupname : group,
 	  	filename : filename,
-	  	directory : directory
+	  	directory : directory,
+	  	groupowner :  owner
 	  })
 	  .then(function (response) {
 	  

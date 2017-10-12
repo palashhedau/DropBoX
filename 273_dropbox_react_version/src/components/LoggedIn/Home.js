@@ -8,9 +8,10 @@ import {createFolder} from '../../actions/CreateFolderAction'
 import {setDirectory} from '../../actions/setDirectoryAction'
 import {setHomeHeading , getAllUsers} from '../../actions/setHomeAction'
 import { Link } from 'react-router-dom'
-import {createGroup , getAllGroups , getAllSharedGroupComponents , openFolderAndViewContent ,  getMembersOfGroup} from '../../actions/GroupAction'
+import {createGroup , getAllGroups , getAllSharedGroupComponents , openFolderAndViewContent ,  getMembersOfGroup , getGroupName} from '../../actions/GroupAction'
 import {checkProfileExist} from '../../actions/submitProfileAction'
 import {openFolderAndViewContentIndividual} from '../../actions/shareFileAction'
+import  NotificationSystem from 'react-notification-system'
 
 export default function(InnerComp ){
 
@@ -18,6 +19,12 @@ class Home extends Component{
 	
 	constructor(props){
 		super(props) ;
+
+		this._notificationSystem = null , 
+        this.successFileAdd = 'File successfully added',
+        this.successFolderAdd = 'Folder added successfully',
+        this.delete = 'File Deleted Successfully'
+
 
 		this.state = {
 			foldername : '' ,
@@ -36,26 +43,46 @@ class Home extends Component{
 
 
 			directoryForHeading : this.props.location.pathname.replace('/home' , '') === '' ? 'root' : 
-						this.props.location.pathname.replace('/home/' , ''),
+								  this.props.location.pathname.replace('/home/' , ''),
 
 			directoryForGroups : this.props.location.pathname.replace('/groups/' , '') ,
 
 			directoryForGroupSubFolder : this.props.location.pathname.indexOf('/sharedFolderInGroup/root/') === 0 ? 
-											this.props.location.pathname.replace('/sharedFolderInGroup/root/' , '') 
-												:
-											this.props.location.pathname.replace('/sharedFolderInGroup/' , '') ,
+										 this.props.location.pathname.replace('/sharedFolderInGroup/root/' , '') 
+										 :
+										 this.props.location.pathname.replace('/sharedFolderInGroup/' , '') ,
 
 			directoryForIndividualSubFolder : this.props.location.pathname.indexOf('/sharedFolderInIndividual/root/') === 0 ? 
-											this.props.location.pathname.replace('/sharedFolderInIndividual/root/' , '') 
-												:
-											this.props.location.pathname.replace('/sharedFolderInIndividual/' , '')
+											  this.props.location.pathname.replace('/sharedFolderInIndividual/root/' , '') 
+											  :
+											  this.props.location.pathname.replace('/sharedFolderInIndividual/' , '')
 
 		}
+
+
+
+
 	}
 
    handleSubmit(e) {
 	    e.preventDefault()
    }
+
+
+
+
+    _addNotification( message ) {
+        	this._notificationSystem.addNotification({
+                message: message,
+                level: 'success'
+            });
+        
+    }
+
+
+
+
+
 	
    componentWillMount() {
    		
@@ -71,7 +98,7 @@ class Home extends Component{
    	  else if(this.state.directoryForHeading === '/groups')
    	  	heading = 'Groups'
    	  else if(this.state.directoryForHeading.indexOf( '/groups/') === 0  )
-   	  	heading = this.state.directoryForGroups
+   	  	heading = this.props.currentGroup
    	  else if(this.state.directoryForHeading.indexOf( '/profile/') === 0  )
    	  	heading = 'Profile : ' + this.props.location.pathname.replace('/profile/' , '')
    	  else if(this.state.directoryForHeading.indexOf( '/profile_details') === 0 ||  this.state.directoryForHeading.indexOf( '/edit_details') === 0  )
@@ -96,8 +123,9 @@ class Home extends Component{
       this.props.getRecentFiles(this.props.email) ; 
       this.props.setDirectory(this.state.directory);
       this.props.getAllUsers(this.props.email) ;
+      this.props.getGroupName(this.state.directoryForGroups) ; 
       this.props.getAllGroups(this.props.email) ; 
-      this.props.getAllSharedGroupComponents(this.props.email , this.state.directoryForGroups);
+      this.props.getAllSharedGroupComponents(this.props.email , this.state.directoryForGroups );
       this.props.getMembersOfGroup(this.props.email , this.state.directoryForGroups);
       
        if(this.props.sharedFolderInsideDetails.fromEmail !== undefined){
@@ -128,7 +156,13 @@ class Home extends Component{
 
 
 
-   
+   componentWillUpdate(nextProps, nextState) {    
+	
+   	if(this.props.currentGroup !== '' && this.state.directoryForHeading.indexOf( '/groups/') === 0 ){
+   		this.props.setHomeHeading(this.props.currentGroup) ;
+   	}
+	
+   }
 
    
 
@@ -228,10 +262,13 @@ class Home extends Component{
 		const textColor = {
 			color: "blue"
 		}
+
+		console.log('Current Group //////////////////// ' , this.props.currentGroup) ; 
+
 		return (
 
 				<div className="row">
-  
+  						 <NotificationSystem ref={n => this._notificationSystem = n} />
 					  <div style={leftdivStyle}>
 					      
 					  	<div style={styleforLeftSmallDiv}>
@@ -292,6 +329,7 @@ class Home extends Component{
 									    }}><a >Logout</a></li>
 									  </ul>
 									</div>
+									<img src={require("../../fonts/bell.JPG")} className="pull-right" height="35" width="70"  />
 								</div>
 						      	
 							      
@@ -317,6 +355,7 @@ class Home extends Component{
 											    		return ; 
 											    	}
 											    	this.props.uploadFile(this.props.email , file , file.name , this.state.directory);
+											    	this._addNotification(this.successFileAdd)
 											    }} style={styleDisplayNone}/>
 											</label>
 								      	</form>
@@ -344,6 +383,7 @@ class Home extends Component{
 									      <div className="modal-footer">
 									       <button type="button" className="btn btn-primary"  data-dismiss="modal" onClick={() => {
 									       		this.props.createFolder(this.props.email , this.state.foldername , this.state.directory);
+									       		this._addNotification(this.successFolderAdd)
 									       }}>Done</button>
 									       <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
 									      </div>
@@ -421,7 +461,8 @@ function mapDispatchToProps(dispatch) {
         getRecentFiles : (email ) => dispatch(getRecentFiles(email)) ,
         checkProfileExist : (email) => dispatch(checkProfileExist(email)),
         openFolderAndViewContent : (email , emailFrom  , foldername) => dispatch(openFolderAndViewContent(email , emailFrom  , foldername)),
-        openFolderAndViewContentIndividual : (email , emailFrom , foldername) => dispatch(openFolderAndViewContentIndividual(email , emailFrom , foldername))
+        openFolderAndViewContentIndividual : (email , emailFrom , foldername) => dispatch(openFolderAndViewContentIndividual(email , emailFrom , foldername)),
+        getGroupName : (id ) => dispatch(getGroupName(id))
     };
 }
 
@@ -438,7 +479,8 @@ function mapStateToProps(state) {
         groupmembers : state.fileUploadReducer.groupmembers,
         profileExist : state.profileReducer.profileExist,
         sharedFolderInsideDetails : state.groupsReducer.sharedCurrentGroup ,
-        sharedByIndividual : state.getClickedFileDataReducer.sharedBy
+        sharedByIndividual : state.getClickedFileDataReducer.sharedBy,
+        currentGroup : state.groupsReducer.groupname ,
     };
 }
 

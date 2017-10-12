@@ -22,6 +22,26 @@ export function createGroup(email , groupname)  {
 }
 
 
+export function getGroupName(groupId)  {
+	
+	return  function(dispatch){
+		axios.post('http://localhost:3002/getGroupName' , {
+			group_id : groupId
+		})
+	    .then(function (response) {
+	  	console.log( response.body)
+	  	dispatch({type : 'GET_GROUP_NAME_SUCCESS' , payload :   response.data.groupname })
+	  	
+	  })
+	  .catch(function (error) {
+	   dispatch({type : 'GET_GROUP_NAME_FAILURE' , payload : error})
+	  })
+	}
+	
+}
+
+
+
 
 export function setCurrentGroupFolder(fromEmail , directory , filename ){
 	return ({
@@ -58,12 +78,13 @@ export function openFolderAndViewContent(email , folderowner ,  foldername)  {
 
 
 
-export function deleteGroup(email , groupname)  {
+export function deleteGroup(email , groupname , id)  {
 	
 	return  function(dispatch){
 		axios.post('http://localhost:3002/deleteGroup' , {
 			email : email,
-			groupname : groupname
+			groupname : groupname,
+			group_id : id
 		})
 	    .then(function (response) {
 	  	console.log( response.body)
@@ -98,14 +119,15 @@ export function getAllGroups(email )  {
 	
 }
 
-export function addMembersToTheGroup(email , emailtoadd , groupname )  {
-	console.log('Params for add memeber ' , email , emailtoadd , groupname) ;
+export function addMembersToTheGroup(email , emailtoadd , groupname , id )  {
+	console.log('Params for add memeber ' , email , emailtoadd , groupname , id) ;
 
 	return  function(dispatch){
 		axios.post('http://localhost:3002/addMemberToGroup' , {
 			email : email,
 			emailtoadd : emailtoadd , 
-			groupname : groupname
+			groupname : groupname,
+			group_id : id
 		})
 	    .then(function (response) {
 	  	console.log( response.data.grouplist)
@@ -128,7 +150,7 @@ export function getAllSharedGroupComponents(email , groupname )  {
 	return  function(dispatch){
 		axios.post('http://localhost:3002/getAllSharedGroupComponents', {
 	  	email : email,
-	  	groupname : groupname
+	  	group_id : groupname
 	  })
 	  .then(function (response) {
 	  
@@ -145,14 +167,14 @@ export function getAllSharedGroupComponents(email , groupname )  {
 
 
 
-export function getMembersOfGroup(email , groupname )  {
-	console.log('Get members params Pollllll' , email , groupname );
+export function getMembersOfGroup(email  , id  )  {
+	console.log('Get members params Pollllll' , email  );
 	
 
 	return  function(dispatch){
 		 axios.post('http://localhost:3002/getMembersOfGroup', {
 	  	email : email,
-	  	groupname : groupname
+	  	group_id : id 
 	  })
 	  .then(function (response) {
 	  
@@ -171,7 +193,7 @@ export function getMembersOfGroup(email , groupname )  {
 
 
 
-export function deleteMembersOfGroup(email , membertodelete ,  groupname )  {
+export function deleteMembersOfGroup(email , membertodelete ,  groupname , id  )  {
 	console.log('Prams for delete users ' , email , membertodelete , groupname) ; 
 	
 
@@ -179,7 +201,8 @@ export function deleteMembersOfGroup(email , membertodelete ,  groupname )  {
 		axios.post('http://localhost:3002/deleteMembersOfGroup', {
 	  	email : email,
 	  	groupname : groupname,
-	  	membertodelete : membertodelete
+	  	membertodelete : membertodelete ,
+	  	group_id : id 
 	  })
 	  .then(function (response) {
 	  

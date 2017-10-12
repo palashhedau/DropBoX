@@ -4,7 +4,8 @@ const initialState = {
 	error : null ,
 	groupmembers : [],
 	sharedCurrentGroup : {} ,
-	sharedCurrentGroupContents : []
+	sharedCurrentGroupContents : [] ,
+	groupname : ''
 }
 
 
@@ -27,6 +28,9 @@ export default function reducer (state=initialState , action )  {
 		}
 		case 'SET_CURRENT_GROUP_FOLDER_CONTENT_SUCCESS' : {
 			return {...state ,  sharedCurrentGroupContents : action.payload }
+		}
+		case 'GET_GROUP_NAME_SUCCESS' : {
+			return {...state ,  groupname : action.payload }
 		}
 		default :
 			return state ; 

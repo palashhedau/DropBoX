@@ -180,7 +180,8 @@ class GroupComponent extends Component{
 								(
 								member.group_user === member.group_owner ? <b></b> :
 								<button className="btn btn-danger pull-right btn-xs" onClick={() => {
-									this.props.deleteMembersOfGroup(this.props.email , member.group_user , this.state.directoryForGroups )
+									this.props.deleteMembersOfGroup(this.props.email , member.group_user , 
+									this.state.directoryForGroups , member.group_id )
 								}}>Delete User</button>
 								)
 								: 
@@ -269,7 +270,7 @@ function mapDispatchToProps(dispatch){
 		deleteGroup : (email , groupname) => dispatch(deleteGroup(email,groupname)),
 		addMembersToTheGroup : (email , emailtoadd , groupname) => dispatch(addMembersToTheGroup(email , emailtoadd , groupname)),
 		getMembersOfGroup : (email , groupname ) => dispatch(getMembersOfGroup(email, groupname)),
-		deleteMembersOfGroup : (email , membertodelete , groupname) => dispatch(deleteMembersOfGroup(email , membertodelete , groupname)),
+		deleteMembersOfGroup : (email , membertodelete , groupname , id ) => dispatch(deleteMembersOfGroup(email , membertodelete , groupname , id)),
 		openFolderAndViewContent : (email , emailFrom , directory , foldername) => dispatch(openFolderAndViewContent(email , emailFrom , directory , foldername)),
 		setCurrentGroupFolder : (email , directory , filename ) => dispatch(setCurrentGroupFolder(email , directory , filename)),
 		getProfile : (email) => dispatch(getProfile(email))

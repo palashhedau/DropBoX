@@ -24,7 +24,7 @@ export function submitProfile(email , about , education , profession , lifeevent
 	}
 	
 }
-updateProfile
+
 
 export function updateProfile(email , about , education , profession , lifeevents )  {
 	

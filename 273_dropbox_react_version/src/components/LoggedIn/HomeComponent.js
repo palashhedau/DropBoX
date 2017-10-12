@@ -5,14 +5,15 @@ import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
 import FileComponent from './FileComponent'
 import FileStarredComponents from './FileStarredComponents'
-
+import  NotificationSystem from 'react-notification-system'
 
 
 
 class HomeComponent extends Component{
 
+	
 
-		
+	
 
 	render(){
 		
@@ -46,7 +47,10 @@ class HomeComponent extends Component{
 				
 
 				<div className=" col-sm-12 col-lg-12 col-md-12 col-xs-12" >
-					      	  
+					
+											
+
+
 
 
 					      	   <div className="row" style={styleBottomBorder}>

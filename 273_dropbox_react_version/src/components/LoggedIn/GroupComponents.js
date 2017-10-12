@@ -37,12 +37,13 @@ class GroupComponent extends Component{
 
 		return (
 				 <li   className="list-group-item padd">
-				 	<Link to={this.state.groupUrl + this.props.group.group_name}>{this.props.group.group_name}</Link>
+				 	<Link  data-toggle="tooltip" data-placement="bottom" title={this.props.group.group_owner}
+				 		   to={this.state.groupUrl + this.props.group.group_id}>{this.props.group.group_name}</Link>
 				 	
 				 	{
 				 		this.props.group.group_user === this.props.group.group_owner ? 
 				 		<button onClick={() => {
-				 		this.props.deleteGroup(this.props.email , this.props.group.group_name)
+				 		this.props.deleteGroup(this.props.email , this.props.group.group_name , this.props.group.group_id)
 				 		}} style={stylePadding} className="btn btn-danger pull-right btn-xs">Delete</button> 
 				 		: 
 				 		<b></b>
@@ -54,30 +55,34 @@ class GroupComponent extends Component{
 
 				 		(
 				 		this.state.showButtonOrDropDown === 'Button' ? 
-				 		<button className="btn btn-primary pull-right btn-xs" onClick={() => {
-				 			this.setState({showButtonOrDropDown : 'DropDOwn'})
-				 		}}>Add Member</button> :
+					 		
+					 		<button className="btn btn-primary pull-right btn-xs" onClick={() => {
+					 			this.setState({showButtonOrDropDown : 'DropDOwn'})
+					 		}}>Add Member</button> 
+
+				 		:
 				 		<div>
-				 		<select className="input-medium" onChange={(e) => {	this.setState({
-													 		addTogroup : e.target.value,})
-												}} className="form-control" id="sel1"> 	
-										 	<option>---Select Email---</option>
-										 	{this.props.AllUsers.map((user , key) => {
-										  		return <option   key={key}>{user.email}</option>
-										  	})} 
+					 		<select className="input-medium" onChange={(e) => {	this.setState({
+														 		addTogroup : e.target.value,})
+													}} className="form-control" id="sel1"> 	
+											 	<option>---Select Email---</option>
+											 	{this.props.AllUsers.map((user , key) => {
+											  		return <option   key={key}>{user.email}</option>
+											  	})} 
 
-						</select>
-						<button className="btn btn-primary btn-sm " onClick={() => {
-							console.log('FOunffffff ' , this.state.addTogroup);
-							if (this.state.addTogroup === ''){
-							}else{
-								this.props.addMembersToTheGroup(this.props.email , this.state.addTogroup , this.props.group.group_name)
-							}
+							</select>
+							<button className="btn btn-primary btn-sm " onClick={() => {
+								
+								if (this.state.addTogroup === ''){
+								}else{
+									this.props.addMembersToTheGroup(this.props.email , this.state.addTogroup , 
+												this.props.group.group_name , this.props.group.group_id)
+								}
 
-							this.setState({
-								showButtonOrDropDown : 'Button'
-							})
-						}}>Add</button>
+								this.setState({
+									showButtonOrDropDown : 'Button'
+								})
+							}}>Add</button>
 						<button style={stylePadding} className="btn btn-danger btn-sm" onClick={() => {
 							this.setState({
 								showButtonOrDropDown : 'Button'
@@ -100,8 +105,8 @@ function mapDispatchToProps(dispatch){
 		starItems : (email , item , directory ) => dispatch(starItems(email ,item , directory)),
 		deleteFile : (email , filename , directory  ) => dispatch(deleteFile(email , filename , directory )),
 		shareFile : (filename , directory , fromUser , toUser ) => dispatch(shareFile(filename , directory , fromUser , toUser )),
-		deleteGroup : (email , groupname) => dispatch(deleteGroup(email,groupname)),
-		addMembersToTheGroup : (email , emailtoadd , groupname) => dispatch(addMembersToTheGroup(email , emailtoadd , groupname))
+		deleteGroup : (email , groupname , id ) => dispatch(deleteGroup(email,groupname ,id )),
+		addMembersToTheGroup : (email , emailtoadd , groupname , id) => dispatch(addMembersToTheGroup(email , emailtoadd , groupname, id))
 	}
 }
 
