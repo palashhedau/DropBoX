@@ -36,6 +36,10 @@ class LoginContent  extends Component{
 
 	render(){
 		
+		const styleColor = {
+			color: "red"
+		}
+
 		const textAlignRight = {
 			textAlign: "right"
 		}
@@ -84,6 +88,17 @@ class LoginContent  extends Component{
 												
 											</div>
 										</div>
+
+										<div className='row padd'>
+											<div className='col-sm-12 col-lg-12 col-md-12'>
+												{
+													this.props.error === true ?
+													<h4 style={styleColor}>Username or Password is Incorrect</h4>
+													:
+													<p></p>
+												}
+											</div>
+										</div>
 									
 								
 				</div>
@@ -111,7 +126,8 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state) {
     return {
-        userFound : state.AuthReducer.userFound
+        userFound : state.AuthReducer.userFound,
+        error : state.AuthReducer.error
     };
 }
 

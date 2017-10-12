@@ -16,7 +16,8 @@ export function register(email , password, fname , lname , gender , dob)  {
 	  	dispatch({type : 'REGISTRATION_SUCCESS' , payload : response.data});
 	  })
 	  .catch(function (error) {
-	   dispatch({type : 'REGISTRATION_FALIURE' , payload : error})
+	  	console.log(error) ; 
+	   dispatch({type : 'REGISTRATION_FALIURE' , payload : true})
 	  })
 	}
 }

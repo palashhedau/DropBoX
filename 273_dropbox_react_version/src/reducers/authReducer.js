@@ -3,7 +3,8 @@ const initialState = {
 	isAuthenticated : false ,
 	user : {} , 
 	token : null ,
-	email : null
+	email : null ,
+	error : false
 }
 
 
@@ -12,6 +13,9 @@ export default function reducer (state=initialState , action )  {
 		case 'SET_CURRENT_USER' : {
 			return {...state , isAuthenticated : action.payload.userFound,
 								token : action.payload.token , email : action.payload.token.id }
+		}
+		case 'CHECKUSER_REJECTED' : {
+			return {...state , error : action.payload }
 		}
 		case 'SET_CURRENT_USER_LOGOUT' : {
 			return {...state , isAuthenticated : action.payload.userFound,

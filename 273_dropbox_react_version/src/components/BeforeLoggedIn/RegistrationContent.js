@@ -157,9 +157,9 @@ class RegistrationContent extends Component{
 										<button  style={sharpCorner} className='btn btn-info btn-block' onClick={() => {
 											console.log('DOB ' , this.state.dob)
 											console.log('DOB ' , this.state.gender)
-											var email_regex = /^[a-z0-9]{3,10}@[a-z]+\.[a-z]+$/i ; 
-											var name_regex = /^[a-z]{5,10}$/i ;
-											var lname_regex = /^[a-z]{5,10}$/i ;
+											var email_regex = /^[a-z0-9]{3,20}@[a-z]+\.[a-z]+$/i ; 
+											var name_regex = /^[a-z]{5,20}$/i ;
+											var lname_regex = /^[a-z]{5,20}$/i ;
 											var password_regex = /^[a-z0-9]{5,20}$/i ; 
 
 											if(!email_regex.test(this.state.email)){
@@ -219,6 +219,10 @@ class RegistrationContent extends Component{
 											this.state.error === '' ? <b></b> :
 											<h4 style={styleColor}>{this.state.error}</h4>
 										}
+										{
+											this.props.error === false ? <b></b> :
+											<h4 style={styleColor}>Email is already taken, please try with a different one</h4>
+										}
 								</div>
 							</div>
 							
@@ -255,7 +259,8 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state) {
     return {
-        registered : state.registerReducer.registered 
+        registered : state.registerReducer.registered ,
+        error : state.registerReducer.error 
     };
 }
 

@@ -24,7 +24,6 @@ import FileHistory from './components/LoggedIn/FileHistory'
 import EditProfile from './components/LoggedIn/EditProfile'
 import SharedSubFolderComponents from './components/LoggedIn/SharedSubFolderComponents'
 import SharedSubFolderIndividualComponents from './components/LoggedIn/SharedSubFolderIndividualComponents'
-import Modal from './components/LoggedIn/Modal'
 
 
 const Main = () => (

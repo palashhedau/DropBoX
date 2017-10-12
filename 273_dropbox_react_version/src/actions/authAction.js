@@ -27,7 +27,8 @@ export function checkUser(email , password)  {
 
 	  })
 	  .catch(function (error) {
-	   dispatch({type : 'CHECKUSER_REJECTED' , payload : error})
+	  	console.log('Rejected Request ' , error)
+	   dispatch({type : 'CHECKUSER_REJECTED' , payload : true})
 	  })
 	}
 }

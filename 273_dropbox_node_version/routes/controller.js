@@ -9,6 +9,7 @@ var readChunk = require('read-chunk');
 var fileType = require('file-type');
 var path = require('path');
 var mime = require('mime');
+var bcrypt = require('bcrypt');
 
 module.exports = function(app){
 	
@@ -48,20 +49,34 @@ module.exports = function(app){
 		const password = req.body.password ; 
 		
 		
-		var query = 'select email , fname , lname from palash.users where email =\'' + email + '\' and password = \'' + password + '\'' ; 
 		
-		CheckIfExistQueryWithoutParams(connection , query , function(rowExist){
-			
-			if(rowExist){
-				const token = jwt.sign({
-					id : email , 
-					username :  email
-				}, config.jwtSecret)
-				
-				res.status(201).json({token : token , success: true , user : rowExist});
+		var checkQuery  = 'select * from users where email = ? ' ;
+		
+		fetchDataQuery(connection , checkQuery ,[email] , function(result){
+			if(result === null ){
+				res.status(500).json({})
 			}else{
-				 res.status(401).json({success: false});
+				
+				if(result[0]){
+					console.log('Resul :  ', result)
+					bcrypt.compare(password, result[0].password, function(err, result) {
+					    if(result == true ){
+					    	const token = jwt.sign({
+								id : email , 
+								username :  email
+							}, config.jwtSecret)
+							
+							res.status(201).json({token : token , success: true , user : true});
+					    }else{
+					    	res.status(401).json({token : null , success: false , user : false});
+					    }
+					});
+				}else{
+					res.status(404).json({token : null , success: false , user : false});
+				}
+				
 			}
+			
 		}) ;
 		
 		
@@ -70,39 +85,44 @@ module.exports = function(app){
 			
 	
 	app.post('/registration',function(req,res)
-			{
-				var email = req.body.email ; 
-				var password = req.body.password ; 
-				var fname = req.body.fname ; 
-				var lname = req.body.lname ; 
-				var dob = req.body.dob ; 
-				var gender = req.body.gender ; 	
+	{
+		var email = req.body.email ; 
+		var password = req.body.password ; 
+		var fname = req.body.fname ; 
+		var lname = req.body.lname ; 
+		var dob = req.body.dob ; 
+		var gender = req.body.gender ; 	
+		const saltRounds = 10;
+		
+		
+		var query = 'select * from users where email =\'' + email +  '\'' ; 
+		
+		CheckIfExistQueryWithoutParams(connection , query , function(rowExist){
+			
+			if(rowExist){
+				res.status(401).json({success : false , error : 'user already present'  }) 
+			}else{
 				
-				var query = 'select * from users where email =\'' + email +  '\'' ; 
-				
-				CheckIfExistQueryWithoutParams(connection , query , function(rowExist){
+				bcrypt.hash(password, saltRounds, function(err, hash) {
 					
-					if(rowExist){
-						res.status(200).json({success : false , error : 'user already present'  }) 
-					}else{
-						
-						var userObject = [[[email , password , fname , lname , dob , gender]]];
-						query1 = 'insert into users (email,password, fname, lname ,gender , dob ) VALUES ?' ; 
-						
-						InserQuery(connection , query1 , userObject , function(result){
-							if(result){
-								console.log('User successfully registered') ;
-								res.status(200).json({success : true , error : null  })
-							}else{
-								res.status(500).json({success : false , error : 'Error coccured while registering'  })
-							}
-						})
-					}
+					var userObject = [[[email , hash , fname , lname , dob , gender]]];
+					query1 = 'insert into users (email,password, fname, lname ,gender , dob ) VALUES ?' ; 
 					
-					
+					InserQuery(connection , query1 , userObject , function(result){
+						if(result){
+							console.log('User successfully registered') ;
+							res.status(200).json({success : true , error : null  })
+						}else{
+							res.status(500).json({success : false , error : 'Error coccured while registering'  })
+						}
+					})
 				})
-				
-			});
+			}
+			
+			
+		})
+		
+	});		
 	
 	
 		app.post('/readallStarredfiles',  function(req, res) {

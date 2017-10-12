@@ -6,6 +6,7 @@ import {connect} from 'react-redux'
 import {deleteFile} from '../../actions/uploadFileAction'
 import {shareFile , shareFileInGroup} from '../../actions/shareFileAction'
 import NotificationSystem from 'react-notification-system'
+import Modal from 'react-modal'
 
 class FileComponent extends Component{
 
@@ -17,7 +18,9 @@ class FileComponent extends Component{
 			shareToEmail : '',
 			shareToGroup : '',
 			showButtonOrDropDown : 'Button' ,
-			showButtonOrDropDownForGroup : 'ButtonForGroup'
+			showButtonOrDropDownForGroup : 'ButtonForGroup',
+			modalIsOpen: false,
+			modal2IsOpen : false 
 		}
 	}
 	
@@ -26,10 +29,6 @@ class FileComponent extends Component{
 
 	render(){
 
-		const style10 = {
-			height: "10%"
-		}
-
 		
 		
 		const styleBottomBorder = {
@@ -37,12 +36,155 @@ class FileComponent extends Component{
 			borderBottom: "solid 2px #E6E8EB",
 			paddingTop:"15px"
 		}
+
+		const style10 = {
+			height: "10%"
+		}
+		const style5 = {
+			height: "5%"
+		}
+
+		
+
+		
+
+		const customStyles = {
+	      content : {
+	        top                   : '40%',
+	        left                  : '50%',
+	        right                 : '50%',
+	        bottom                : '40%',
+	        marginRight           : '-50%',
+	        transform             : 'translate(-50%, -50%)'
+	      }
+	    };
+
+		
+
+		const stylePadding = {
+			paddingTop : "30px"
+		}
+
+		
+
+		const FontSize = {
+			fontSize: "20px"
+		}
+
 		console.log('Starred or not ' , this.props.file.starred) 
 		return (
 			
 
 			 <li   className="list-group-item padd" style={styleBottomBorder}>
-			 		
+			 	
+
+			 	 <Modal
+                        isOpen={this.state.modalIsOpen}
+                        style= {customStyles}
+                        onRequestClose={this.closeModal}
+                        shouldCloseOnOverlayClick={false}
+                        contentLabel="Profile">
+
+                        <div>
+					 		<div>
+						 		<select onChange={(e) => {	this.setState({
+															 		shareToEmail : e.target.value,})
+														}} className="form-control" id="sel1"> 	
+												 	<option>---Select User---</option> 
+												 	{this.props.AllUsers.map((user , key) => {
+												  		return <option   key={key}>{user.email}</option>
+												  	})} 
+
+								</select>
+							</div>
+
+							<div style={stylePadding}>
+								
+								<button className="btn btn-danger btn-sm  pull-right" onClick={() => {
+									this.setState({
+										modalIsOpen : false
+									})
+								}}>Cancel</button>
+
+								<button className="btn btn-primary btn-sm pull-right" onClick={() => {
+										       		this.props.email === this.state.shareToEmail ? 
+										       		console.log('Cannot share with ourself') :
+										       		(
+										       			this.props.shareFile(this.props.file.file_name , this.props.file.directory,
+										       			this.props.email , this.state.shareToEmail)
+										       		)
+										       		this.setState({
+														modalIsOpen : false
+													})
+										       	
+								 }}>Add</button>
+								
+								
+							</div>
+
+						</div>
+						   
+
+	                        
+                        
+                 </Modal>
+
+
+                 <Modal
+                        isOpen={this.state.modal2IsOpen}
+                        style= {customStyles}
+                        onRequestClose={this.closeModal}
+                        shouldCloseOnOverlayClick={false}
+                        contentLabel="Profile">
+
+                        <div>
+                        	<div>
+						 		<select onChange={(e) => {	this.setState({
+															 		shareToGroup : e.target.value,})
+														}} className="form-control" id="sel1">
+
+														<option>---Select Group---</option> 	
+												 	{this.props.groupList.map((group , key) => {
+												  		return <option   key={key}>{group.group_name} - {group.group_owner}</option>
+												  	})} 
+
+								</select>
+							</div>
+
+							<div>
+
+								<button className="btn btn-danger btn-sm pull-right" onClick={() => {
+									this.setState({
+										modal2IsOpen : false 
+									})
+								}}>Cancel</button>
+								<button className="btn btn-primary btn-sm pull-right" onClick={() => {
+									       		this.setState({
+									       			
+									       		})
+									       		this.props.shareFileInGroup(this.props.email , this.state.shareToGroup 
+									       			,this.props.file.file_name , this.props.file.directory  )
+									       		this.setState({
+									       			modal2IsOpen : false 
+									       		})
+									       }}>Add</button>
+								
+							</div>
+
+						
+						</div>
+						   
+
+	                        
+                        
+                 </Modal>
+
+
+
+
+
+
+
 			 	{
 			 		this.props.file.is_directory === '1' ? 
 			 			<Link   to={this.state.url  + this.props.file.file_name} > 
@@ -72,11 +214,20 @@ class FileComponent extends Component{
 			 							 src={require("../../fonts/expand.JPG")}  height="25" width="50"  />
 			 					
 			 					<ul className="dropdown-menu">
-						          <li className="list-group-item"><a>Download</a></li>
 						          <li className="list-group-item" onClick={() => {
 						          	this.props.deleteFile(this.props.email , this.props.file.file_name , this.props.file.directory)
 						          	console.log('Delete by notification')
 						          }}><a>Delete</a></li>
+						          <li className="list-group-item"><a onClick={() => {
+						          	this.setState({
+										modalIsOpen : true
+									})
+						          }}>Share</a></li>
+						          <li className="list-group-item"><a onClick={() => {
+						          	this.setState({
+										modal2IsOpen : true
+									})
+						          }}>Share with Group</a></li>
 						        </ul>
 			 				</li>
 			 			</ul>
@@ -93,84 +244,6 @@ class FileComponent extends Component{
 			 			this.props.starItems(this.props.email , this.props.file.file_name , this.props.file.directory);
 			 			}} src={require("../../fonts/rStar.JPG")} height="20" width="54" /></span>
 					}
-
-
-					{
-				 		this.state.showButtonOrDropDownForGroup === 'ButtonForGroup' ? 
-				 		<button className="btn btn-default pull-right btn-xs" onClick={() => {
-				 			this.setState({showButtonOrDropDownForGroup : 'DropDOwn2'
-				 							})
-				 		}}>Share with Group</button> :
-				 		<div>
-				 		<select onChange={(e) => {	this.setState({
-													 		shareToGroup : e.target.value,})
-												}} className="form-control" id="sel1">
-
-												<option>---Select Group---</option> 	
-										 	{this.props.groupList.map((group , key) => {
-										  		return <option   key={key}>{group.group_name} - {group.group_owner}</option>
-										  	})} 
-
-						</select>
-						<button className="btn btn-primary btn-sm " onClick={() => {
-									       		this.setState({
-									       			showButtonOrDropDownForGroup : 'ButtonForGroup'
-									       		})
-									       		this.props.shareFileInGroup(this.props.email , this.state.shareToGroup 
-									       			,this.props.file.file_name , this.props.file.directory  )
-									       		
-									       }}>Add</button>
-						<button className="btn btn-danger btn-sm" onClick={() => {
-							this.setState({
-								showButtonOrDropDownForGroup : 'ButtonForGroup'
-							})
-						}}>Cancel</button>
-						</div>
-				 	}
-
-
-
-
-				 	{
-				 		this.state.showButtonOrDropDown === 'Button' ? 
-				 		<button className="btn btn-default pull-right btn-xs" onClick={() => {
-				 			this.setState({
-				 							showButtonOrDropDown : 'Dropdown'})
-				 		}}>Share</button> :
-				 		<div>
-				 		<select onChange={(e) => {	this.setState({
-													 		shareToEmail : e.target.value,})
-												}} className="form-control" id="sel1"> 	
-										 	<option>---Select User---</option> 
-										 	{this.props.AllUsers.map((user , key) => {
-										  		return <option   key={key}>{user.email}</option>
-										  	})} 
-
-						</select>
-						<button className="btn btn-primary btn-sm " onClick={() => {
-									       		this.props.email === this.state.shareToEmail ? 
-									       		console.log('Cannot share with ourself') :
-									       		(
-									       			this.props.shareFile(this.props.file.file_name , this.props.file.directory,
-									       			this.props.email , this.state.shareToEmail)
-									       		)
-									       		this.setState({
-									       			showButtonOrDropDown : 'Button'
-									       		})
-									       		
-									       }}>Add</button>
-						<button className="btn btn-danger btn-sm" onClick={() => {
-							this.setState({
-								showButtonOrDropDown : 'Button'
-							})
-						}}>Cancel</button>
-						</div>
-				 	}
-
-			 		
-					
-
-			 		
 
 
 			 </li>
