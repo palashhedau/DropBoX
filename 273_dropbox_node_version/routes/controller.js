@@ -11,43 +11,24 @@ var path = require('path');
 var mime = require('mime');
 var bcrypt = require('bcrypt');
 
-module.exports = function(app){
+
+
+module.exports = function(app , connection ){
 	
 	 app.use(upload()) ; 
 	 
-	 var connection = mysql.createPool({
-		 connectionLimit : 500 ,  
-		 host : 'localhost',
-		 user : 'root',
-		 password : 'root',
-		 database : 'palash'
-	 });
-	 
-	
-	 
-	 
-	 
-	
-	app.post('/viewFile',  function(req, res) {
+	 app.post('/viewFile',  function(req, res) {
 		console.log('Voew the file ') ; 
 		 
 		 res.sendFile(path.resolve('C:/data/Projects/273_dropbox_node_version/public/Images/palash/20140616_172407.jpg'  )) ; 
-		 
-		 
-	  })
+	 })
 	 
-	  
-	 
-	 
-	
-			
-	
 	app.post('/validateUser' , function(req,res)
 	{
-		console.log('CHeck user called ') ; 
+		
 		const email = req.body.email ;
 		const password = req.body.password ; 
-		
+		console.log(email) ; 
 		
 		
 		var checkQuery  = 'select * from users where email = ? ' ;
@@ -58,7 +39,7 @@ module.exports = function(app){
 			}else{
 				
 				if(result[0]){
-					console.log('Resul :  ', result)
+					
 					bcrypt.compare(password, result[0].password, function(err, result) {
 					    if(result == true ){
 					    	const token = jwt.sign({
@@ -98,11 +79,9 @@ module.exports = function(app){
 		var query = 'select * from users where email =\'' + email +  '\'' ; 
 		
 		CheckIfExistQueryWithoutParams(connection , query , function(rowExist){
-			
 			if(rowExist){
 				res.status(401).json({success : false , error : 'user already present'  }) 
 			}else{
-				
 				bcrypt.hash(password, saltRounds, function(err, hash) {
 					
 					var userObject = [[[email , hash , fname , lname , dob , gender]]];
@@ -110,7 +89,6 @@ module.exports = function(app){
 					
 					InserQuery(connection , query1 , userObject , function(result){
 						if(result){
-							console.log('User successfully registered') ;
 							res.status(200).json({success : true , error : null  })
 						}else{
 							res.status(500).json({success : false , error : 'Error coccured while registering'  })
@@ -122,7 +100,7 @@ module.exports = function(app){
 			
 		})
 		
-	});		
+});		
 	
 	
 		app.post('/readallStarredfiles',  function(req, res) {
@@ -155,7 +133,12 @@ module.exports = function(app){
 		 
 		
 		fetchDataQuery(connection , query ,[email, directory] , function(result){
-			res.status(200).json({starred_data : result})
+			if(result == null){
+				res.status(400).json({starred_data : result})
+			}else{
+				res.status(200).json({starred_data : result})
+			}
+			
 		} )
 		
 	})
@@ -862,13 +845,13 @@ module.exports = function(app){
 								 	
 								 connection.getConnection(function(err , tempConnect){
 										if(err){
-											tempConnect.release();
+											
 											console.log(err);
 											return fn(false);
 										}else{
 											tempConnect.query('select * from group_files where group_name = ? and group_owner = ? ' ,[groupname , groupowner] ,
 													function(err , rows , fields){
-												tempConnect.release(); 
+												 
 												if(err ){
 													console.log('Error while fetching data ' , err);
 													res.status(500).json({})
@@ -1205,37 +1188,35 @@ app.post('/delete',  function(req, res) {
 
 
 function fetchDataQuery(connection , query , params , fn){
-	
-	
 	connection.getConnection(function(err , tempConnect){
 		if(err){
-			tempConnect.release();
+			if(tempConnect != undefined){
+				tempConnect.release();
+			}
 			console.log(err);
 			return fn(false);
 		}else{
 			tempConnect.query(query ,params ,  function(err , rows , fields){
-				tempConnect.release(); 
+				tempConnect.release();
 				if(err ){
-					console.log('Error while fetching data ' , err);
 					return fn(null) ; 
 				} 
 				else{
 					return fn(rows);
 				}
-				
-				
-			 })
+			})
 		}
 	})
 }
-
 
 
 function UpdateQuery(connection , query , params , fn){
 	 
 	connection.getConnection(function(err , tempConnect){
 		if(err){
-			tempConnect.release();
+			if(tempConnect != undefined){
+				tempConnect.release();
+			}
 			console.log(err);
 			return fn(false);
 		}else{
@@ -1251,16 +1232,17 @@ function UpdateQuery(connection , query , params , fn){
 			})
 		}
 	})
-
 }
 
 
 function InserQuery(connection , query , params , fn){
-	console.log('Query ' , params )
 	
 	connection.getConnection(function(err , tempConnect){
 		if(err){
-			tempConnect.release();
+			if(tempConnect != undefined){
+				tempConnect.release();
+			}
+			console.log(err);
 			return fn(false);
 		}else{
 			tempConnect.query(query,params ,function(err  , result){
@@ -1275,21 +1257,24 @@ function InserQuery(connection , query , params , fn){
 			})
 		}
 	})
+	
+	
+	
 }
 
 
 
 function DeleteQuery(connection , query , params , fn){
-	console.log('Query ' , params )
-	
 	connection.getConnection(function(err , tempConnect){
 		if(err){
-			tempConnect.release();
+			if(tempConnect != undefined){
+				tempConnect.release();
+			}
 			console.log(err);
 			return fn(false);
 		}else{
 			tempConnect.query(query,params ,function(err  , result){
-				tempConnect.release() ;
+				tempConnect.release();
 				if(err){
 					console.log(err);
 					return fn(false);
@@ -1309,12 +1294,14 @@ function CheckIfExistQuery(connection , query , params ,  fn ){
 	
 	connection.getConnection(function(err , tempConnect){
 		if(err){
-			tempConnect.release();
+			if(tempConnect != undefined){
+				tempConnect.release();
+			}
 			console.log(err);
 			return fn(false);
 		}else{
 			tempConnect.query(query , params , function(err , rows , fields){
-				tempConnect.release() ; 
+				tempConnect.release();
 				if(err ) throw err ;
 				
 				if(rows[0]){
@@ -1335,7 +1322,9 @@ function CheckIfExistQueryWithoutParams(connection , query , fn ){
 	
 	connection.getConnection(function(err , tempConnect){
 		if(err){
-			tempConnect.release();
+			if(tempConnect != undefined){
+				tempConnect.release();
+			}
 			console.log(err);
 			return fn(false);
 		}else{

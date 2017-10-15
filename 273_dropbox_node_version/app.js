@@ -5,8 +5,7 @@ var express = require('express')
 var cors = require('cors');
 var morgan = require('morgan')
 var bodyParser = require('body-parser');  
-var sessions = require("client-sessions");
-
+var mysql = require ('mysql'); 
 
 var app = express();
 
@@ -15,13 +14,6 @@ app.use(cors());
 
 app.use(morgan('dev')) ; 
 
-
-app.use(sessions({
-	  cookieName: 'mySession',
-	  secret: 'blargadeeblargblarg',
-	  duration: 10 * 60 * 1000, 
-	  activeDuration: 5 * 60 * 1000 
-	}));
 
 
 
@@ -34,7 +26,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); 
 
-controller(app) ; 
+
+
+var connection = mysql.createPool({
+	 connectionLimit : 2500 ,  
+	 host : 'localhost',
+	 user : 'root',
+	 password : 'root',
+	 database : 'palash'
+});
+
+
+
+
+controller(app , connection ) ; 
 
 
 http.createServer(app).listen(app.get('port'), function(){
