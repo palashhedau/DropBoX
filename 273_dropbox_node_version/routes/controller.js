@@ -499,8 +499,8 @@ module.exports = function(app , connection ){
 				 console.log('First Delete error ') ; 
 				 res.status(500).json({}) 
 			 }else{
-				 var query2 = 'delete from palash.group_files where file_owner = ? and group_name = ? and group_owner = ? and file_owner <> group_owner' ; 
-				 var params2 = [membertodelete ,groupname , email   ] ; 
+				 var query2 = 'delete  from palash.group_files where file_owner = ?  and group_owner = ?   and group_name in (select group_name from palash.users_groups where group_id = ? )' ; 
+				 var params2 = [membertodelete  , email , group_id   ] ; 
 				 
 				 DeleteQuery(connection, query2 , params2 , function(result){
 					 if(!result){
